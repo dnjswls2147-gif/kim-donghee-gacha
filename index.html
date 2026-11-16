@@ -103,24 +103,57 @@
             padding: 20px;
             position: relative;
             margin-bottom: 15px;
+            min-height: 280px;
         }
 
-        .weapon-card-box {
+        /* 카드 뒤집기 스타일 */
+        .card-container {
+            perspective: 1000px;
             width: 150px;
             height: 150px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card-container.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
             border-radius: 16px;
-            background: #222840;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
             border: 3px solid #4a5580;
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-            margin-bottom: 12px;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #2b324b, #1a1f33);
+            font-size: 32px;
+            color: #ffd700;
+        }
+
+        .card-front {
+            background: #222840;
+            transform: rotateY(180deg);
             overflow: hidden;
         }
 
-        .weapon-card-box img {
+        .card-front img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -164,10 +197,10 @@
 
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             border: none;
             border-radius: 14px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -198,6 +231,14 @@
             background: #2b324b;
             color: #fff;
             border: 1px solid #48537a;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: #fff;
+            margin-top: 5px;
+            padding: 10px;
+            font-size: 13px;
         }
 
         .modal {
@@ -267,8 +308,6 @@
         }
 
         .inv-item {
-            background: #1a1f33;
-            border: 1px solid #2a3352;
             border-radius: 12px;
             padding: 12px;
             display: flex;
@@ -289,11 +328,27 @@
             color: #ffd700;
         }
 
-        .badge-general { background: #4a5568; color: #fff; }
-        .badge-rare { background: #3182ce; color: #fff; }
-        .badge-epic { background: #805ad5; color: #fff; }
-        .badge-legendary { background: #dd6b20; color: #fff; }
-        .badge-myth { background: #e53e3e; color: #fff; }
+        /* 등급별 색상 지정 (일반: 회색, 희귀: 파란색, 영웅: 보라색, 전설: 노란색, 신화: 빨간색) */
+        .grade-general { background: #4a5568; color: #fff; border: 1px solid #718096; }
+        .grade-rare { background: #2b6cb0; color: #fff; border: 1px solid #3182ce; }
+        .grade-epic { background: #6b46c1; color: #fff; border: 1px solid #805ad5; }
+        .grade-legendary { background: #d69e2e; color: #fff; border: 1px solid #ecc94b; }
+        .grade-myth { background: #9b2c2c; color: #fff; border: 1px solid #e53e3e; }
+
+        /* 10연차 결과 모달 그리드 */
+        .multi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .multi-item {
+            background: #1a1f33;
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         #toast {
             position: fixed;
@@ -310,14 +365,16 @@
             transition: transform 0.3s ease;
             z-index: 1000;
             pointer-events: none;
+            opacity: 0;
         }
 
         #toast.show {
             transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
-<body>
+<body onclick="initAudioUser()">
 
 <div class="container">
     <div class="header">
@@ -325,7 +382,7 @@
         <div class="title-area">
             <h1>김동희 세계관 칼 뽑기</h1>
         </div>
-        <button class="btn-icon" id="soundToggle" onclick="toggleSound()">🔊 사운드</button>
+        <div style="width: 50px;"></div>
     </div>
 
     <div class="stats-bar">
@@ -339,11 +396,16 @@
         </div>
     </div>
 
-    <div class="gacha-screen">
-        <div class="weapon-card-box" id="cardBox">
-            <img id="weaponImg" src="15157.jpg" alt="무기 이미지">
+    <div class="gacha-screen" id="gachaScreen">
+        <div class="card-container" id="mainCard" onclick="flipCardManual()">
+            <div class="card-inner" id="cardInner">
+                <div class="card-back">⚔️</div>
+                <div class="card-front">
+                    <img id="weaponImg" src="15157.jpg" alt="무기 이미지">
+                </div>
+            </div>
         </div>
-        <div class="rarity-badge badge-general" id="weaponRarity">일반</div>
+        <div class="rarity-badge grade-general" id="weaponRarity">일반</div>
         <div class="weapon-name" id="weaponName">나무 뭉둥이</div>
     </div>
 
@@ -353,16 +415,19 @@
         </button>
         <div class="btn-row">
             <button class="btn btn-multi" onclick="pullWeapon(10)">
-                ✨ 10연차 뽑기 (900골드)
+                ✨ 10연차 뽑기 (1,000골드)
             </button>
             <button class="btn btn-inventory" onclick="openModal('invModal')">
                 🎒 보관함
             </button>
         </div>
+        <button class="btn btn-save" onclick="saveGameData()">
+            💾 데이터 수동 저장
+        </button>
     </div>
 </div>
 
-<!-- 확률표 모달 (이름 : 확률 형태) -->
+<!-- 확률표 모달 -->
 <div class="modal" id="rateModal">
     <div class="modal-header">
         <h2>김동희 세계관 확률표</h2>
@@ -377,11 +442,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr><td>나무 뭉둥이</td><td style="text-align: right; color:#a0aec0;">65.0%</td></tr>
-                <tr><td>크로노스 인페르노</td><td style="text-align: right; color:#3182ce;">15.0%</td></tr>
-                <tr><td>이클립스</td><td style="text-align: right; color:#805ad5;">10.0%</td></tr>
-                <tr><td>불칼</td><td style="text-align: right; color:#dd6b20;">7.5%</td></tr>
-                <tr><td>일렉시아스</td><td style="text-align: right; color:#e53e3e;">2.5%</td></tr>
+                <tr><td>나무 뭉둥이 (일반)</td><td style="text-align: right; color:#a0aec0;">65.0%</td></tr>
+                <tr><td>크로노스 인페르노 (희귀)</td><td style="text-align: right; color:#3182ce;">15.0%</td></tr>
+                <tr><td>이클립스 (영웅)</td><td style="text-align: right; color:#805ad5;">10.0%</td></tr>
+                <tr><td>불칼 (전설)</td><td style="text-align: right; color:#ecc94b;">7.5%</td></tr>
+                <tr><td>일렉시아스 (신화)</td><td style="text-align: right; color:#e53e3e;">2.5%</td></tr>
             </tbody>
         </table>
     </div>
@@ -398,53 +463,89 @@
     </div>
 </div>
 
+<!-- 10연차 결과 모달 -->
+<div class="modal" id="multiModal">
+    <div class="modal-header">
+        <h2>✨ 10연차 뽑기 결과</h2>
+        <button class="modal-close" onclick="closeModal('multiModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <div class="multi-grid" id="multiResultGrid"></div>
+    </div>
+</div>
+
 <div id="toast">알림</div>
 
 <script>
     const weapons = [
-        { id: 0, name: "나무 뭉둥이", rarity: "일반", badgeClass: "badge-general", color: "#a0aec0", img: "15157.jpg", rate: 65.0 },
-        { id: 1, name: "크로노스 인페르노", rarity: "희귀", badgeClass: "badge-rare", color: "#3182ce", img: "15158.jpg", rate: 15.0 },
-        { id: 2, name: "이클립스", rarity: "영웅", badgeClass: "badge-epic", color: "#805ad5", img: "15159.jpg", rate: 10.0 },
-        { id: 3, name: "불칼", rarity: "전설", badgeClass: "badge-legendary", color: "#dd6b20", img: "15161.jpg", rate: 7.5 },
-        { id: 4, name: "일렉시아스", rarity: "신화", badgeClass: "badge-myth", color: "#e53e3e", img: "15162.jpg", rate: 2.5 }
+        { id: 0, name: "나무 뭉둥이", rarity: "일반", badgeClass: "grade-general", img: "15157.jpg", rate: 65.0 },
+        { id: 1, name: "크로노스 인페르노", rarity: "희귀", badgeClass: "grade-rare", img: "15158.jpg", rate: 15.0 },
+        { id: 2, name: "이클립스", rarity: "영웅", badgeClass: "grade-epic", img: "15159.jpg", rate: 10.0 },
+        { id: 3, name: "불칼", rarity: "전설", badgeClass: "grade-legendary", img: "15161.jpg", rate: 7.5 },
+        { id: 4, name: "일렉시아스", rarity: "신화", badgeClass: "grade-myth", img: "15162.jpg", rate: 2.5 }
     ];
 
     let state = {
         totalPulls: 0,
         gold: 10000,
-        inventory: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
-        soundOn: true
+        inventory: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
     };
 
-    let audioCtx = null;
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // 로컬 스토리지 불러오기
+    function loadGameData() {
+        const saved = localStorage.getItem('donghee_gacha_save');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                state.totalPulls = parsed.totalPulls || 0;
+                state.gold = parsed.gold !== undefined ? parsed.gold : 10000;
+                state.inventory = parsed.inventory || { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
+            } catch(e) {}
+        }
     }
 
-    function playSound(type) {
-        if (!state.soundOn) return;
-        initAudio();
+    function saveGameData() {
+        localStorage.setItem('donghee_gacha_save', JSON.stringify(state));
+        showToast("💾 데이터가 안전하게 저장되었다!");
+    }
+
+    // Web Audio API 효과음 생성 (자동 재생)
+    let audioCtx = null;
+    function initAudioUser() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playEpicSound(isHigh) {
+        initAudioUser();
         if (!audioCtx) return;
+        const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
 
-        if (type === 'pull') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(200, now);
-            osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-            gain.gain.setValueAtTime(0.3, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        if (isHigh) {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
             osc.start(now);
-            osc.stop(now + 0.15);
+            osc.stop(now + 0.5);
+        } else {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(400, now + 0.2);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.25);
         }
-    }
-
-    function toggleSound() {
-        state.soundOn = !state.soundOn;
-        document.getElementById('soundToggle').innerText = state.soundOn ? "🔊 사운드" : "🔇 사운드";
     }
 
     function getRandomWeapon() {
@@ -457,8 +558,12 @@
         return weapons[0];
     }
 
+    let flipTimer = null;
+    let isFlipped = true;
+
     function pullWeapon(count) {
-        const cost = count === 10 ? 900 : 100;
+        initAudioUser();
+        const cost = count === 10 ? 1000 : 100;
         if (state.gold < cost) {
             showToast("⚠️ 골드가 부족하다!");
             return;
@@ -466,42 +571,82 @@
 
         state.gold -= cost;
         state.totalPulls += count;
-        playSound('pull');
 
-        const cardBox = document.getElementById('cardBox');
-        cardBox.classList.remove('shake');
-        void cardBox.offsetWidth;
-        cardBox.classList.add('shake');
-
-        let lastWeapon = null;
-        for (let i = 0; i < count; i++) {
+        if (count === 1) {
+            playEpicSound(false);
             const w = getRandomWeapon();
             state.inventory[w.id]++;
-            lastWeapon = w;
+
+            // 카드 뒤집기 연출 준비 (뒷면으로 세팅)
+            const cardContainer = document.getElementById('mainCard');
+            cardContainer.classList.remove('flipped');
+            isFlipped = false;
+
+            document.getElementById('weaponImg').src = w.img;
+            const badge = document.getElementById('weaponRarity');
+            badge.innerText = w.rarity;
+            badge.className = `rarity-badge ${w.badgeClass}`;
+            document.getElementById('weaponName').innerText = w.name;
+
+            if (w.id >= 3) {
+                playEpicSound(true);
+                showToast(`🔥 대박! [${w.name}] 득템!`);
+            }
+
+            // 1초 뒤 자동 뒤집기
+            clearTimeout(flipTimer);
+            flipTimer = setTimeout(() => {
+                if (!isFlipped) {
+                    cardContainer.classList.add('flipped');
+                    isFlipped = true;
+                }
+            }, 1000);
+
+        } else {
+            // 10연차 처리 (각각 랜덤 1개씩 10개 뽑기)
+            playEpicSound(true);
+            let results = [];
+            let highestId = 0;
+            for (let i = 0; i < 10; i++) {
+                const w = getRandomWeapon();
+                state.inventory[w.id]++;
+                results.push(w);
+                if (w.id > highestId) highestId = w.id;
+            }
+
+            // 10연차 결과 모달 표시
+            const grid = document.getElementById('multiResultGrid');
+            grid.innerHTML = '';
+            results.forEach(w => {
+                const div = document.createElement('div');
+                div.className = `multi-item ${w.badgeClass}`;
+                div.innerHTML = `
+                    <div style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; flex-shrink:0;">
+                        <img src="${w.img}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div style="overflow:hidden;">
+                        <div style="font-size: 12px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${w.name}</div>
+                        <div style="font-size: 10px; opacity: 0.8;">${w.rarity}</div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            openModal('multiModal');
+            showToast("✨ 10연차 뽑기 완료!");
         }
 
         updateUI();
-        displayWeapon(lastWeapon);
-
-        if (count === 10) {
-            showToast(`✨ 10연차 완료! (마지막: ${lastWeapon.name})`);
-        } else if (lastWeapon.id >= 3) {
-            showToast(`🎉 대박! [${lastWeapon.name}] 득템!`);
-        }
-
+        saveGameData();
         updateInventoryGrid();
     }
 
-    function displayWeapon(w) {
-        document.getElementById('weaponImg').src = w.img;
-        
-        const badge = document.getElementById('weaponRarity');
-        badge.innerText = w.rarity;
-        badge.className = `rarity-badge ${w.badgeClass}`;
-
-        const nameEl = document.getElementById('weaponName');
-        nameEl.innerText = w.name;
-        nameEl.style.color = w.color;
+    function flipCardManual() {
+        const cardContainer = document.getElementById('mainCard');
+        if (!isFlipped) {
+            cardContainer.classList.add('flipped');
+            isFlipped = true;
+            clearTimeout(flipTimer);
+        }
     }
 
     function updateUI() {
@@ -519,11 +664,11 @@
             div.className = `inv-item ${w.badgeClass}`;
             div.innerHTML = `
                 <div class="inv-count">${count}개</div>
-                <div style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
+                <div style="width: 55px; height: 55px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
                     <img src="${w.img}" style="width:100%; height:100%; object-fit:cover;">
                 </div>
-                <div style="font-size: 13px; font-weight: bold; color: ${w.color};">${w.name}</div>
-                <div style="font-size: 10px; color: #a0aec0; margin-top: 2px;">${w.rarity}</div>
+                <div style="font-size: 13px; font-weight: bold; white-space: nowrap;">${w.name}</div>
+                <div style="font-size: 10px; margin-top: 2px; opacity: 0.9;">${w.rarity}</div>
             `;
             grid.appendChild(div);
         });
@@ -545,6 +690,8 @@
         document.getElementById(id).style.display = 'none';
     }
 
+    // 초기 실행
+    loadGameData();
     updateUI();
     updateInventoryGrid();
 </script>
