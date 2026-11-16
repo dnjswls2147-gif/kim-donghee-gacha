@@ -1,580 +1,522 @@
-여기 바로 플레이하실 수 있는 김동희 세계관 칼 뽑기 게임의 미리보기 열기 버튼입니다!
-​<antArtifact identifier="kim-dong-hee-gacha" type="application/vnd.ant.code" language="html" title="김동희 세계관 칼 뽑기">
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>김동희 세계관 칼 뽑기</title>
-<style>
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-user-select: none;
-}
-​body {
-background-color: #0f1016;
-color: #ffffff;
-display: flex;
-justify-content: center;
-align-items: center;
-min-height: 100vh;
-overflow-x: hidden;
-}
-​.container {
-width: 100%;
-max-width: 440px;
-min-height: 100vh;
-background: linear-gradient(135deg, #151828 0%, #0b0d14 100%);
-display: flex;
-flex-direction: column;
-padding: 20px;
-box-shadow: 0 0 30px rgba(0,0,0,0.8);
-position: relative;
-}
-​/* 상단 헤더 */
-.header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 15px;
-}
-​.title-area {
-text-align: center;
-flex-grow: 1;
-}
-​.title-area h1 {
-font-size: 22px;
-background: linear-gradient(45deg, #ffcc00, #ff5555, #cc44ff);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-font-weight: 900;
-text-shadow: 0 2px 10px rgba(255,100,100,0.3);
-}
-​.title-area p {
-font-size: 11px;
-color: #8b9bb4;
-margin-top: 2px;
-}
-​.btn-icon {
-background: #222639;
-border: 1px solid #3a4260;
-color: #fff;
-padding: 6px 10px;
-border-radius: 8px;
-font-size: 12px;
-cursor: pointer;
-transition: all 0.2s;
-}
-​.btn-icon:active {
-transform: scale(0.95);
-}
-​/* 재화 및 정보 바 */
-.stats-bar {
-display: flex;
-justify-content: space-around;
-background: rgba(26, 31, 51, 0.8);
-border: 1px solid rgba(255, 255, 255, 0.08);
-border-radius: 12px;
-padding: 12px;
-margin-bottom: 15px;
-}
-​.stat-item {
-text-align: center;
-}
-​.stat-label {
-font-size: 11px;
-color: #8b9bb4;
-}
-​.stat-value {
-font-size: 16px;
-font-weight: bold;
-color: #ffd700;
-margin-top: 2px;
-}
-​/* 메인 뽑기 연출 화면 */
-.gacha-screen {
-flex-grow: 1;
-background: rgba(18, 22, 38, 0.9);
-border: 2px solid #2a3352;
-border-radius: 20px;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-padding: 20px;
-position: relative;
-box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-min-height: 280px;
-margin-bottom: 15px;
-}
-​.weapon-card-box {
-width: 140px;
-height: 140px;
-border-radius: 16px;
-background: #222840;
-display: flex;
-align-items: center;
-justify-content: center;
-position: relative;
-border: 3px solid #4a5580;
-box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-margin-bottom: 15px;
-transition: transform 0.3s;
-}
-​.weapon-card-box.shake {
-animation: shake 0.4s ease-in-out;
-}
-​@keyframes shake {
-0% { transform: translate(1px, 1px) rotate(0deg); }
-20% { transform: translate(-3px, 0px) rotate(-3deg); }
-40% { transform: translate(3px, -2px) rotate(3deg); }
-60% { transform: translate(-1px, 2px) rotate(0deg); }
-80% { transform: translate(1px, -1px) rotate(1deg); }
-100% { transform: translate(0, 0) rotate(0deg); }
-}
-​.weapon-img-placeholder {
-font-size: 45px;
-}
-​.rarity-badge {
-font-size: 11px;
-padding: 3px 10px;
-border-radius: 10px;
-font-weight: bold;
-margin-bottom: 6px;
-text-transform: uppercase;
-}
-​.weapon-name {
-font-size: 20px;
-font-weight: 900;
-margin-bottom: 4px;
-text-align: center;
-}
-​.weapon-desc {
-font-size: 11px;
-color: #a0aec0;
-text-align: center;
-max-width: 260px;
-line-height: 1.3;
-}
-​/* 하단 버튼 그룹 */
-.action-buttons {
-display: flex;
-flex-direction: column;
-gap: 10px;
-margin-bottom: 15px;
-}
-​.btn {
-width: 100%;
-padding: 15px;
-border: none;
-border-radius: 14px;
-font-size: 16px;
-font-weight: bold;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-transition: filter 0.2s, transform 0.1s;
-box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-​.btn:active {
-transform: scale(0.98);
-}
-​.btn-single {
-background: linear-gradient(135deg, #ff8008 0%, #ffc837 100%);
-color: #1a1a1a;
-}
-​.btn-row {
-display: flex;
-gap: 10px;
-}
-​.btn-multi {
-flex: 2;
-background: linear-gradient(135deg, #7928ca 0%, #b800ff 100%);
-color: #fff;
-}
-​.btn-inventory {
-flex: 1;
-background: #2b324b;
-color: #fff;
-border: 1px solid #48537a;
-}
-​/* 확률표 및 인벤토리 모달 */
-.modal {
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(11, 13, 20, 0.92);
-z-index: 100;
-display: none;
-flex-direction: column;
-padding: 20px;
-animation: fadeIn 0.2s ease-out;
-}
-​@keyframes fadeIn {
-from { opacity: 0; transform: scale(0.98); }
-to { opacity: 1; transform: scale(1); }
-}
-​.modal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 20px;
-border-bottom: 1px solid #2a3352;
-padding-bottom: 12px;
-}
-​.modal-header h2 {
-font-size: 18px;
-color: #ffd700;
-}
-​.modal-close {
-background: none;
-border: none;
-color: #fff;
-font-size: 22px;
-cursor: pointer;
-}
-​.modal-body {
-flex-grow: 1;
-overflow-y: auto;
-display: flex;
-flex-direction: column;
-gap: 10px;
-}
-​/* 확률표 스타일 */
-.rate-table {
-width: 100%;
-border-collapse: collapse;
-font-size: 13px;
-}
-​.rate-table th, .rate-table td {
-padding: 10px;
-text-align: center;
-border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-​.rate-table th {
-color: #8b9bb4;
-background: rgba(255,255,255,0.03);
-}
-​/* 인벤토리 격자 */
-.inventory-grid {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 12px;
-}
-​.inv-item {
-background: #1a1f33;
-border: 1px solid #2a3352;
-border-radius: 12px;
-padding: 12px;
-display: flex;
-flex-direction: column;
-align-items: center;
-text-align: center;
-position: relative;
-}
-​.inv-count {
-position: absolute;
-top: 8px;
-right: 10px;
-font-size: 11px;
-background: rgba(0,0,0,0.5);
-padding: 2px 6px;
-border-radius: 6px;
-color: #ffd700;
-}
-​/* 등급별 색상 */
-.grade-general { color: #a0aec0; border-color: #4a5568; }
-.grade-rare { color: #3182ce; border-color: #3182ce; }
-.grade-epic { color: #805ad5; border-color: #805ad5; }
-.grade-legendary { color: #dd6b20; border-color: #dd6b20; }
-.grade-myth { color: #e53e3e; border-color: #e53e3e; }
-​.badge-general { background: #4a5568; color: #fff; }
-.badge-rare { background: #3182ce; color: #fff; }
-.badge-epic { background: #805ad5; color: #fff; }
-.badge-legendary { background: #dd6b20; color: #fff; }
-.badge-myth { background: #e53e3e; color: #fff; }
-​/* 토스트 알림 */
-#toast {
-position: fixed;
-top: 20px;
-left: 50%;
-transform: translateX(-50%) translateY(-50px);
-background: linear-gradient(135deg, #00b09b, #96c93d);
-color: #fff;
-padding: 10px 20px;
-border-radius: 20px;
-font-size: 13px;
-font-weight: bold;
-box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-transition: transform 0.3s ease;
-z-index: 1000;
-pointer-events: none;
-}
-​#toast.show {
-transform: translateX(-50%) translateY(0);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김동희 세계관 칼 뽑기</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Jua', sans-serif;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #09090b 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .title-font {
+            font-family: 'Black Han Sans', sans-serif;
+        }
+        .glow-common { text-shadow: 0 0 10px rgba(156, 163, 175, 0.7); }
+        .glow-rare { text-shadow: 0 0 15px rgba(59, 130, 246, 0.9); }
+        .glow-epic { text-shadow: 0 0 20px rgba(168, 85, 247, 0.9); }
+        .glow-legendary { text-shadow: 0 0 25px rgba(234, 179, 8, 0.9); }
+        .glow-mythic { text-shadow: 0 0 30px rgba(239, 68, 68, 1); animation: pulse-red 1.5s infinite; }
+
+        @keyframes pulse-red {
+            0%, 100% { text-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(239, 68, 68, 0.5); }
+            50% { text-shadow: 0 0 35px rgba(239, 68, 68, 1), 0 0 60px rgba(239, 68, 68, 0.8); }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(-2deg); }
+            40% { transform: translate(3px, 2px) rotate(2deg); }
+            60% { transform: translate(-1px, -1px) rotate(0deg); }
+            80% { transform: translate(2px, 1px) rotate(1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out infinite;
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            70% { transform: scale(1.1) rotate(3deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp 8s linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+    </style>
 </head>
-<body>
-​<div class="container">
-<!-- 상단 헤더 -->
-<div class="header">
-<button class="btn-icon" onclick="openModal('rateModal')">📊 확률표</button>
-<div class="title-area">
-<h1>김동희 세계관 칼 뽑기</h1>
-<p>전설의 명기를 획득하고 최강의 검객이 되어보세요!</p>
-</div>
-<button class="btn-icon" id="soundToggle" onclick="toggleSound()">🔊 사운드</button>
-</div>
-​<!-- 스탯 바 -->
-<div class="stats-bar">
-<div class="stat-item">
-<div class="stat-label">총 뽑기 횟수</div>
-<div class="stat-value" id="totalPulls">0회</div>
-</div>
-<div class="stat-item">
-<div class="stat-label">보유 골드</div>
-<div class="stat-value" id="goldCount">💰 10,000</div>
-</div>
-</div>
-​<!-- 메인 뽑기 화면 -->
-<div class="gacha-screen" id="gachaScreen">
-<div class="weapon-card-box" id="cardBox">
-<div class="weapon-img-placeholder" id="weaponIcon">🪵</div>
-</div>
-<div class="rarity-badge badge-general" id="weaponRarity">일반</div>
-<div class="weapon-name" id="weaponName">나무 뭉둥이</div>
-<div class="weapon-desc" id="weaponDesc">길가에 나뒹굴던 평범한 나무 뭉둥이 무기.</div>
-</div>
-​<!-- 하단 조작 버튼 -->
-<div class="action-buttons">
-<button class="btn btn-single" onclick="pullWeapon(1)">
-⚔️ 단차 뽑기 (1회: 100골드)
-</button>
-<div class="btn-row">
-<button class="btn btn-multi" onclick="pullWeapon(10)">
-✨ 10연차 뽑기 (900골드)
-</button>
-<button class="btn btn-inventory" onclick="openModal('invModal')">
-🎒 보관함
-</button>
-</div>
-</div>
-</div>
-​<!-- 확률표 모달 -->
-<div class="modal" id="rateModal">
-<div class="modal-header">
-<h2>김동희 세계관 확률표</h2>
-<button class="modal-close" onclick="closeModal('rateModal')">×</button>
-</div>
-<div class="modal-body">
-<table class="rate-table">
-<thead>
-<tr>
-<th>순서</th>
-<th>검 이름</th>
-<th>등급</th>
-<th>확률</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1번</td>
-<td>나무 뭉둥이</td>
-<td><span style="color:#a0aec0">일반</span></td>
-<td>65.0%</td>
-</tr>
-<tr>
-<td>2번</td>
-<td>크로노스 인페르노</td>
-<td><span style="color:#3182ce">희귀</span></td>
-<td>15.0%</td>
-</tr>
-<tr>
-<td>3번</td>
-<td>이클립스</td>
-<td><span style="color:#805ad5">영웅</span></td>
-<td>10.0%</td>
-</tr>
-<tr>
-<td>4번</td>
-<td>불칼</td>
-<td><span style="color:#dd6b20">전설</span></td>
-<td>7.5%</td>
-</tr>
-<tr>
-<td>5번</td>
-<td>일렉시아스</td>
-<td><span style="color:#e53e3e">신화</span></td>
-<td>2.5%</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-​<!-- 인벤토리 모달 -->
-<div class="modal" id="invModal">
-<div class="modal-header">
-<h2>보유한 무기 보관함</h2>
-<button class="modal-close" onclick="closeModal('invModal')">×</button>
-</div>
-<div class="modal-body">
-<div class="inventory-grid" id="inventoryGrid">
-<!-- JS로 렌더링 -->
-</div>
-</div>
-</div>
-​<!-- 토스트 알림 -->
-<div id="toast">획득 알림</div>
-​<script>
-// 무기 데이터 정의 (1~5번 순서 및 확률 정확 반영)
-const weapons = [
-{ id: 0, name: "나무 뭉둥이", rarity: "일반", badgeClass: "badge-general", color: "#a0aec0", icon: "🪵", desc: "길가에 나뒹굴던 평범한 나무 뭉둥이 무기.", rate: 65.0 },
-{ id: 1, name: "크로노스 인페르노", rarity: "희귀", badgeClass: "badge-rare", color: "#3182ce", icon: "⏳", desc: "시간과 불꽃의 에너지가 담긴 강력한 검.", rate: 15.0 },
-{ id: 2, name: "이클립스", rarity: "영웅", badgeClass: "badge-epic", color: "#805ad5", icon: "🌑", desc: "일식의 기운을 품은 어둠의 명검.", rate: 10.0 },
-{ id: 3, name: "불칼", rarity: "전설", badgeClass: "badge-legendary", color: "#dd6b20", icon: "🔥", desc: "닿는 모든 것을 불태우는 전설의 불검.", rate: 7.5 },
-{ id: 4, name: "일렉시아스", rarity: "신화", badgeClass: "badge-myth", color: "#e53e3e", icon: "⚡", desc: "세계관 최강의 번개를 품은 궁극의 신검.", rate: 2.5 }
-];
-​let state = {
-totalPulls: 0,
-gold: 10000,
-inventory: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
-soundOn: true
-};
-​// Web Audio API 효과음 생성기
-let audioCtx = null;
-function initAudio() {
-if (!audioCtx) {
-audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-}
-​function playSound(type) {
-if (!state.soundOn) return;
-initAudio();
-if (!audioCtx) return;
-​const osc = audioCtx.createOscillator();
-const gain = audioCtx.createGain();
-osc.connect(gain);
-gain.connect(audioCtx.destination);
-​const now = audioCtx.currentTime;
-​if (type === 'pull') {
-osc.type = 'triangle';
-osc.frequency.setValueAtTime(200, now);
-osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-gain.gain.setValueAtTime(0.3, now);
-gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-osc.start(now);
-osc.stop(now + 0.15);
-} else if (type === 'high') {
-osc.type = 'sine';
-osc.frequency.setValueAtTime(400, now);
-osc.frequency.setValueAtTime(600, now + 0.1);
-osc.frequency.setValueAtTime(900, now + 0.2);
-gain.gain.setValueAtTime(0.4, now);
-gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-osc.start(now);
-osc.stop(now + 0.4);
-}
-}
-​function toggleSound() {
-state.soundOn = !state.soundOn;
-document.getElementById('soundToggle').innerText = state.soundOn ? "🔊 사운드 켜짐" : "🔇 사운드 꺼짐";
-}
-​// 가챠 확률 로직
-function getRandomWeapon() {
-const rand = Math.random() * 100;
-let cumulative = 0;
-for (let w of weapons) {
-cumulative += w.rate;
-if (rand <= cumulative) return w;
-}
-return weapons[0];
-}
-​function pullWeapon(count) {
-const cost = count === 10 ? 900 : 100;
-if (state.gold < cost) {
-showToast("⚠️ 골드가 부족합니다!");
-return;
-}
-​state.gold -= cost;
-state.totalPulls += count;
-​playSound('pull');
-​// 연출 애니메이션
-const cardBox = document.getElementById('cardBox');
-cardBox.classList.remove('shake');
-void cardBox.offsetWidth;
-cardBox.classList.add('shake');
-​// 결과 선정 (10연차인 경우 마지막 검 표시)
-let lastWeapon = null;
-for (let i = 0; i < count; i++) {
-const w = getRandomWeapon();
-state.inventory[w.id]++;
-lastWeapon = w;
-}
-​updateUI();
-​// 결과 화면 반영
-displayWeapon(lastWeapon);
-​if (count === 10) {
-showToast(✨ 10연차 완료! (마지막 획득: ${lastWeapon.name}));
-} else {
-if (lastWeapon.id >= 3) {
-playSound('high');
-showToast(🎉 대단합니다! [${lastWeapon.name}] 획득!);
-}
-}
-​updateInventoryGrid();
-}
-​function displayWeapon(w) {
-document.getElementById('weaponIcon').innerText = w.icon;
-​const badge = document.getElementById('weaponRarity');
-badge.innerText = w.rarity;
-badge.className = rarity-badge ${w.badgeClass};
-​const nameEl = document.getElementById('weaponName');
-nameEl.innerText = w.name;
-nameEl.style.color = w.color;
-​document.getElementById('weaponDesc').innerText = w.desc;
-}
-​function updateUI() {
-document.getElementById('totalPulls').innerText = state.totalPulls + "회";
-document.getElementById('goldCount').innerText = "💰 " + state.gold.toLocaleString();
-}
-​function updateInventoryGrid() {
-const grid = document.getElementById('inventoryGrid');
-grid.innerHTML = '';
-​weapons.forEach(w => {
-const count = state.inventory[w.id];
-const div = document.createElement('div');
-div.className = inv-item ${w.badgeClass};
-div.innerHTML = <div class="inv-count">${count}개</div> <div style="font-size: 30px; margin-bottom: 5px;">${w.icon}</div> <div style="font-size: 13px; font-weight: bold; color: ${w.color};">${w.name}</div> <div style="font-size: 10px; color: #a0aec0; margin-top: 2px;">${w.rarity}</div>;
-grid.appendChild(div);
-});
-}
-​function showToast(msg) {
-const toast = document.getElementById('toast');
-toast.innerText = msg;
-toast.classList.add('show');
-setTimeout(() => {
-toast.classList.remove('show');
-}, 2000);
-}
-​function openModal(id) {
-document.getElementById(id).style.display = 'flex';
-if (id === 'invModal') updateInventoryGrid();
-}
-​function closeModal(id) {
-document.getElementById(id).style.display = 'none';
-}
-​// 초기 실행
-updateUI();
-updateInventoryGrid();
-</script>
-​</body>
+<body class="flex flex-col min-h-screen relative select-none">
+
+    <!-- Background Floating Particles -->
+    <div id="particles" class="absolute inset-0 overflow-hidden z-0"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 flex flex-col items-center justify-between min-h-screen p-4 max-w-xl mx-auto w-full">
+        
+        <!-- Header -->
+        <header class="w-full text-center py-2 flex flex-col items-center">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs text-yellow-300 bg-yellow-900/40 px-2.5 py-1 rounded-full border border-yellow-700/50">김동희 세계관 공식</span>
+                <button onclick="toggleAudio()" id="audio-toggle-btn" class="text-xs bg-slate-800 text-gray-300 px-3 py-1 rounded-full border border-slate-700 hover:bg-slate-700 transition">🔊 효과음 켜짐</button>
+            </div>
+            <h1 class="title-font text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 tracking-wider drop-shadow-lg">
+                ⚔️ 김동희 세계관 칼 뽑기 ⚔️
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-300 mt-1">전설의 명기를 획득하고 최강의 검객이 되어보세요!</p>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl p-3 flex justify-around items-center backdrop-blur-md shadow-xl text-xs sm:text-sm my-2">
+            <div class="text-center">
+                <span class="text-gray-400 block text-[11px]">총 뽑기 횟수</span>
+                <span id="total-pulls" class="text-lg font-bold text-yellow-400">0회</span>
+            </div>
+            <div class="h-6 w-px bg-slate-700"></div>
+            <div class="text-center">
+                <span class="text-gray-400 block text-[11px]">보유 골드</span>
+                <span id="user-gold" class="text-lg font-bold text-amber-400">🪙 10,000</span>
+            </div>
+        </div>
+
+        <!-- Center Gacha Display Area -->
+        <main class="w-full flex-1 flex flex-col items-center justify-center my-2">
+            <div id="gacha-box" class="w-full aspect-square max-w-[300px] bg-gradient-to-b from-slate-800/95 to-slate-900/95 border-4 border-slate-700 rounded-3xl p-4 flex flex-col items-center justify-center relative shadow-2xl backdrop-blur-md transition-all duration-300">
+                
+                <!-- Idle State -->
+                <div id="idle-display" class="flex flex-col items-center text-center">
+                    <div class="w-24 h-24 bg-slate-700/50 rounded-2xl border-2 border-dashed border-slate-500 flex items-center justify-center mb-3 shadow-inner">
+                        <svg class="w-12 h-12 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path></svg>
+                    </div>
+                    <h2 class="text-base font-bold text-gray-200">버튼을 눌러 칼을 뽑아보세요!</h2>
+                    <p class="text-[11px] text-gray-400 mt-1">1~5번 무기 중 하나를 획득하세요.</p>
+                </div>
+
+                <!-- Result State -->
+                <div id="result-display" class="hidden flex-col items-center text-center w-full h-full justify-center">
+                    <div id="card-frame" class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl flex items-center justify-center p-1.5 shadow-2xl border-2 mb-2 bg-slate-950 animate-pop overflow-hidden">
+                        <img id="weapon-img" src="" alt="검 이미지" class="w-full h-full object-cover rounded-xl shadow-md">
+                    </div>
+                    <span id="weapon-rarity-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider mb-0.5 shadow-md">등급</span>
+                    <h3 id="weapon-name" class="text-lg sm:text-xl font-black mt-0.5">검 이름</h3>
+                    <p id="weapon-desc" class="text-[11px] text-gray-300 mt-0.5 px-2 line-clamp-1">설명</p>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Controls Section -->
+        <div class="w-full flex flex-col gap-2.5 my-2">
+            <button id="pull-btn" onclick="executeGacha(1)" class="w-full py-3.5 rounded-2xl title-font text-lg sm:text-xl bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all border-2 border-yellow-300/50 flex items-center justify-center gap-2 cursor-pointer">
+                <span>⚔️ 단차 뽑기 (1회: 100골드)</span>
+            </button>
+            <div class="flex gap-2">
+                <button onclick="executeGacha(10)" class="flex-1 py-2.5 rounded-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md hover:opacity-95 active:scale-95 transition-all text-xs sm:text-sm border border-purple-400/30">
+                    ✨ 10연차 뽑기 (900골드)
+                </button>
+                <button onclick="resetData()" class="px-4 py-2.5 rounded-xl font-bold bg-slate-800 text-gray-400 hover:text-white hover:bg-slate-700 transition-all text-xs border border-slate-700">
+                    🔄 초기화
+                </button>
+            </div>
+        </div>
+
+        <!-- Probability Table Accordion -->
+        <div class="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-xl my-2">
+            <div class="flex justify-between items-center cursor-pointer" onclick="toggleProbTable()">
+                <h4 class="font-bold text-xs sm:text-sm text-yellow-400 flex items-center gap-2">
+                    📊 김동희 세계관 확률표 및 검 목록 보기
+                </h4>
+                <span id="toggle-icon" class="text-xs text-gray-400 transition-transform duration-300">▼</span>
+            </div>
+            
+            <div id="prob-table-container" class="hidden mt-2.5 overflow-x-auto transition-all">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-gray-400">
+                            <th class="py-1.5 px-2">사진</th>
+                            <th class="py-1.5 px-2">등급 / 이름</th>
+                            <th class="py-1.5 px-2 text-right">확률</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prob-tbody" class="divide-y divide-slate-800/80">
+                        <!-- Populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-[10px] text-slate-500 py-1">
+            김동희 세계관 공식 가챠 게임 &bull; All Rights Reserved
+        </footer>
+
+    </div>
+
+    <!-- Toast Popup -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-800/95 border border-yellow-500 text-white px-5 py-2.5 rounded-2xl shadow-2xl z-50 transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-10 flex items-center gap-2.5">
+        <span id="toast-icon" class="text-lg">⚠️</span>
+        <span id="toast-msg" class="text-xs font-bold">알림 메시지</span>
+    </div>
+
+    <!-- Script Engine -->
+    <script>
+        // -------------------------------------------------------------
+        // Weapon Data Definitions (Exact match to 5 user photos in order)
+        // -------------------------------------------------------------
+        const weapons = [
+            {
+                id: 1,
+                name: "나무 뭉둥이",
+                rarity: "일반",
+                chance: 65.0,
+                color: "text-gray-400",
+                badgeBg: "bg-gray-700 text-gray-200",
+                borderCol: "border-gray-500",
+                glowClass: "glow-common",
+                desc: "첫 번째 사진: 길가에 나뒹굴던 나무 뭉둥이와 올빼미 시계.",
+                image: "15157.jpg"
+            },
+            {
+                id: 2,
+                name: "크로노스 인페르노",
+                rarity: "희귀",
+                chance: 15.0,
+                color: "text-blue-400",
+                badgeBg: "bg-blue-900/80 text-blue-300",
+                borderCol: "border-blue-500",
+                glowClass: "glow-rare",
+                desc: "두 번째 사진: 전 서버에 단 2개뿐인 분홍빛 명검.",
+                image: "15158.jpg"
+            },
+            {
+                id: 3,
+                name: "이클립스",
+                rarity: "영웅",
+                chance: 10.0,
+                color: "text-purple-400",
+                badgeBg: "bg-purple-900/80 text-purple-300",
+                borderCol: "border-purple-500",
+                glowClass: "glow-epic",
+                desc: "세 번째 사진: 붉은 문양이 새겨진 적월선 검.",
+                image: "15159.jpg"
+            },
+            {
+                id: 4,
+                name: "불칼",
+                rarity: "전설",
+                chance: 7.5,
+                color: "text-amber-400",
+                badgeBg: "bg-amber-900/80 text-amber-300",
+                borderCol: "border-amber-500",
+                glowClass: "glow-legendary",
+                desc: "네 번째 사진: 빨간 불칼 글자 모양의 독특한 무기.",
+                image: "15161.jpg"
+            },
+            {
+                id: 5,
+                name: "일렉시아스",
+                rarity: "신화",
+                chance: 2.5,
+                color: "text-red-500",
+                badgeBg: "bg-red-900/80 text-red-300",
+                borderCol: "border-red-500",
+                glowClass: "glow-mythic",
+                desc: "다섯 번째 사진: 죽음의 데스 사이드 낫과 후드 복장.",
+                image: "15162.jpg"
+            }
+        ];
+
+        let totalPulls = 0;
+        let userGold = 10000;
+        let isPulling = false;
+        let audioEnabled = true;
+
+        // -------------------------------------------------------------
+        // Web Audio API Sound System
+        // -------------------------------------------------------------
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audio-toggle-btn');
+            btn.innerText = audioEnabled ? "🔊 효과음 켜짐" : "🔇 효과음 꺼짐";
+            showToast(audioEnabled ? "효과음이 켜졌습니다." : "효과음이 꺼졌습니다.", "🎵");
+        }
+
+        function playTickSound() {
+            if (!audioEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(250 + Math.random() * 150, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function playResultSound(rarityIndex) {
+            if (!audioEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                if (rarityIndex <= 1) {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.25);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(now + 0.25);
+                } else if (rarityIndex === 2 || rarityIndex === 3) {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.setValueAtTime(600, now + 0.1);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(now + 0.4);
+                } else {
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const chordOsc = audioCtx.createOscillator();
+                        const chordGain = audioCtx.createGain();
+                        chordOsc.type = 'sawtooth';
+                        chordOsc.frequency.setValueAtTime(freq, now + (idx * 0.06));
+                        chordGain.gain.setValueAtTime(0.08, now + (idx * 0.06));
+                        chordGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7 + (idx * 0.06));
+                        chordOsc.connect(chordGain);
+                        chordGain.connect(audioCtx.destination);
+                        chordOsc.start(now + (idx * 0.06));
+                        chordOsc.stop(now + 0.8 + (idx * 0.06));
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // UI Population
+        // -------------------------------------------------------------
+        function populateProbTable() {
+            const tbody = document.getElementById('prob-tbody');
+            tbody.innerHTML = '';
+            weapons.forEach(w => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-1.5 px-2">
+                        <img src="${w.image}" class="w-8 h-8 rounded-lg object-cover border border-slate-700" onerror="this.src='https://placehold.co/50x50/1e293b/f8fafc?text=Img'">
+                    </td>
+                    <td class="py-1.5 px-2">
+                        <span class="font-bold ${w.color}">${w.rarity}</span> <span class="text-gray-200">${w.name}</span>
+                    </td>
+                    <td class="py-1.5 px-2 text-right font-mono text-gray-300">${w.chance}%</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleProbTable() {
+            const container = document.getElementById('prob-table-container');
+            const icon = document.getElementById('toggle-icon');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                container.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function showToast(message, icon = "✨") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMsg.innerText = message;
+            toastIcon.innerText = icon;
+            
+            toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-10');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-10');
+            }, 2200);
+        }
+
+        // -------------------------------------------------------------
+        // Gacha Logic
+        // -------------------------------------------------------------
+        function getRandomWeapon() {
+            const rand = Math.random() * 100;
+            let cumulative = 0;
+            for (let i = 0; i < weapons.length; i++) {
+                cumulative += weapons[i].chance;
+                if (rand <= cumulative) {
+                    return weapons[i];
+                }
+            }
+            return weapons[0];
+        }
+
+        function executeGacha(count) {
+            if (isPulling) return;
+            const cost = count === 10 ? 900 : 100;
+            if (userGold < cost) {
+                showToast(`골드가 부족합니다! (필요 골드: ${cost})`, "🪙");
+                return;
+            }
+
+            userGold -= cost;
+            totalPulls += count;
+            updateStats();
+
+            isPulling = true;
+            const pullBtn = document.getElementById('pull-btn');
+            pullBtn.disabled = true;
+
+            const gachaBox = document.getElementById('gacha-box');
+            const idleDisplay = document.getElementById('idle-display');
+            const resultDisplay = document.getElementById('result-display');
+
+            idleDisplay.classList.add('hidden');
+            resultDisplay.classList.add('hidden');
+            gachaBox.classList.add('animate-shake', 'border-yellow-500');
+
+            let tickCount = 0;
+            const maxTicks = 10;
+            const tickInterval = setInterval(() => {
+                playTickSound();
+                tickCount++;
+                if (tickCount >= maxTicks) {
+                    clearInterval(tickInterval);
+                    finishPull(count);
+                }
+            }, 50);
+        }
+
+        function finishPull(count) {
+            const gachaBox = document.getElementById('gacha-box');
+            const resultDisplay = document.getElementById('result-display');
+            const pullBtn = document.getElementById('pull-btn');
+
+            gachaBox.classList.remove('animate-shake', 'border-yellow-500');
+
+            let selectedWeapon;
+            if (count === 10) {
+                let rolls = [];
+                for (let i = 0; i < 10; i++) rolls.push(getRandomWeapon());
+                rolls.sort((a, b) => b.id - a.id);
+                selectedWeapon = rolls[0];
+            } else {
+                selectedWeapon = getRandomWeapon();
+            }
+
+            const imgEl = document.getElementById('weapon-img');
+            const badgeEl = document.getElementById('weapon-rarity-badge');
+            const nameEl = document.getElementById('weapon-name');
+            const descEl = document.getElementById('weapon-desc');
+            const cardFrame = document.getElementById('card-frame');
+
+            imgEl.src = selectedWeapon.image;
+            badgeEl.innerText = count === 10 ? `${selectedWeapon.rarity} (10연차 최고)` : selectedWeapon.rarity;
+            badgeEl.className = `px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider mb-0.5 shadow-md ${selectedWeapon.badgeBg}`;
+            nameEl.innerText = selectedWeapon.name;
+            nameEl.className = `text-lg sm:text-xl font-black mt-0.5 ${selectedWeapon.color} ${selectedWeapon.glowClass}`;
+            descEl.innerText = selectedWeapon.desc;
+            cardFrame.className = `relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl flex items-center justify-center p-1.5 shadow-2xl border-2 mb-2 bg-slate-950 animate-pop overflow-hidden ${selectedWeapon.borderCol}`;
+
+            resultDisplay.classList.remove('hidden');
+            resultDisplay.classList.add('flex');
+
+            playResultSound(selectedWeapon.id - 1);
+
+            if (selectedWeapon.id >= 4) {
+                showToast(`🎉 대단합니다! [${selectedWeapon.name}] 획득!`, "⚡");
+            }
+
+            isPulling = false;
+            pullBtn.disabled = false;
+        }
+
+        function updateStats() {
+            document.getElementById('total-pulls').innerText = `${totalPulls}회`;
+            document.getElementById('user-gold').innerText = `🪙 ${userGold.toLocaleString()}`;
+        }
+
+        function resetData() {
+            totalPulls = 0;
+            userGold = 10000;
+            updateStats();
+            document.getElementById('result-display').classList.add('hidden');
+            document.getElementById('idle-display').classList.remove('hidden');
+            showToast("데이터가 초기화되었습니다.", "🔄");
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${Math.random() * 6 + 4}s`;
+                particle.style.animationDelay = `${Math.random() * 4}s`;
+                container.appendChild(particle);
+            }
+        }
+
+        window.onload = function() {
+            populateProbTable();
+            createParticles();
+            updateStats();
+        };
+    </script>
+</body>
 </html>
-</antArtifact>
