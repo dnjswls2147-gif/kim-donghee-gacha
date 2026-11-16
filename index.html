@@ -113,6 +113,7 @@
             height: 150px;
             margin-bottom: 12px;
             cursor: pointer;
+            position: relative;
         }
 
         .card-inner {
@@ -159,26 +160,28 @@
             object-fit: cover;
         }
 
-        .weapon-card-box.shake {
-            animation: shake 0.4s ease-in-out;
+        /* 등급별 특수 효과 디자인 */
+        .effect-general { border-color: #718096; box-shadow: 0 0 15px rgba(113,128,150,0.4); }
+        .effect-rare { border-color: #3182ce; box-shadow: 0 0 20px rgba(49,130,206,0.6); }
+        .effect-epic { border-color: #805ad5; box-shadow: 0 0 20px rgba(128,90,213,0.6); }
+        .effect-legendary { border-color: #ecc94b; box-shadow: 0 0 25px rgba(236,201,75,0.8); }
+        .effect-myth { 
+            border-color: #e53e3e; 
+            box-shadow: 0 0 30px rgba(229,62,62,0.9);
+            animation: fireGlow 1.5s infinite alternate;
         }
 
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            20% { transform: translate(-3px, 0px) rotate(-3deg); }
-            40% { transform: translate(3px, -2px) rotate(3deg); }
-            60% { transform: translate(-1px, 2px) rotate(0deg); }
-            80% { transform: translate(1px, -1px) rotate(1deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
+        @keyframes fireGlow {
+            0% { box-shadow: 0 0 15px #e53e3e, inset 0 0 10px #ff8787; }
+            100% { box-shadow: 0 0 30px #ff4d4d, inset 0 0 20px #ff6b6b; }
         }
 
-        .rarity-badge {
-            font-size: 11px;
-            padding: 3px 10px;
-            border-radius: 10px;
+        .extra-badge-text {
+            font-size: 13px;
             font-weight: bold;
             margin-bottom: 6px;
-            text-transform: uppercase;
+            min-height: 20px;
+            text-align: center;
         }
 
         .weapon-name {
@@ -186,6 +189,7 @@
             font-weight: 900;
             margin-bottom: 10px;
             text-align: center;
+            min-height: 30px;
         }
 
         .action-buttons {
@@ -231,14 +235,6 @@
             background: #2b324b;
             color: #fff;
             border: 1px solid #48537a;
-        }
-
-        .btn-save {
-            background: linear-gradient(135deg, #00b09b, #96c93d);
-            color: #fff;
-            margin-top: 5px;
-            padding: 10px;
-            font-size: 13px;
         }
 
         .modal {
@@ -328,27 +324,12 @@
             color: #ffd700;
         }
 
-        /* 등급별 색상 지정 (일반: 회색, 희귀: 파란색, 영웅: 보라색, 전설: 노란색, 신화: 빨간색) */
+        /* 인벤토리 등급별 색상 */
         .grade-general { background: #4a5568; color: #fff; border: 1px solid #718096; }
         .grade-rare { background: #2b6cb0; color: #fff; border: 1px solid #3182ce; }
         .grade-epic { background: #6b46c1; color: #fff; border: 1px solid #805ad5; }
         .grade-legendary { background: #d69e2e; color: #fff; border: 1px solid #ecc94b; }
         .grade-myth { background: #9b2c2c; color: #fff; border: 1px solid #e53e3e; }
-
-        /* 10연차 결과 모달 그리드 */
-        .multi-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .multi-item {
-            background: #1a1f33;
-            border-radius: 10px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
 
         #toast {
             position: fixed;
@@ -400,30 +381,27 @@
         <div class="card-container" id="mainCard" onclick="flipCardManual()">
             <div class="card-inner" id="cardInner">
                 <div class="card-back">⚔️</div>
-                <div class="card-front">
+                <div class="card-front" id="cardFrontBox">
                     <img id="weaponImg" src="15157.jpg" alt="무기 이미지">
                 </div>
             </div>
         </div>
-        <div class="rarity-badge grade-general" id="weaponRarity">일반</div>
-        <div class="weapon-name" id="weaponName">나무 뭉둥이</div>
+        <div class="extra-badge-text" id="extraEffectText"></div>
+        <div class="weapon-name" id="weaponName">???</div>
     </div>
 
     <div class="action-buttons">
-        <button class="btn btn-single" onclick="pullWeapon(1)">
+        <button class="btn btn-single" onclick="startPull(1)" id="btnSingle">
             ⚔️ 단차 뽑기 (1회: 100골드)
         </button>
         <div class="btn-row">
-            <button class="btn btn-multi" onclick="pullWeapon(10)">
+            <button class="btn btn-multi" onclick="startPull(10)" id="btnMulti">
                 ✨ 10연차 뽑기 (1,000골드)
             </button>
             <button class="btn btn-inventory" onclick="openModal('invModal')">
                 🎒 보관함
             </button>
         </div>
-        <button class="btn btn-save" onclick="saveGameData()">
-            💾 데이터 수동 저장
-        </button>
     </div>
 </div>
 
@@ -463,26 +441,15 @@
     </div>
 </div>
 
-<!-- 10연차 결과 모달 -->
-<div class="modal" id="multiModal">
-    <div class="modal-header">
-        <h2>✨ 10연차 뽑기 결과</h2>
-        <button class="modal-close" onclick="closeModal('multiModal')">&times;</button>
-    </div>
-    <div class="modal-body">
-        <div class="multi-grid" id="multiResultGrid"></div>
-    </div>
-</div>
-
 <div id="toast">알림</div>
 
 <script>
     const weapons = [
-        { id: 0, name: "나무 뭉둥이", rarity: "일반", badgeClass: "grade-general", img: "15157.jpg", rate: 65.0 },
-        { id: 1, name: "크로노스 인페르노", rarity: "희귀", badgeClass: "grade-rare", img: "15158.jpg", rate: 15.0 },
-        { id: 2, name: "이클립스", rarity: "영웅", badgeClass: "grade-epic", img: "15159.jpg", rate: 10.0 },
-        { id: 3, name: "불칼", rarity: "전설", badgeClass: "grade-legendary", img: "15161.jpg", rate: 7.5 },
-        { id: 4, name: "일렉시아스", rarity: "신화", badgeClass: "grade-myth", img: "15162.jpg", rate: 2.5 }
+        { id: 0, name: "나무 뭉둥이", rarity: "일반", effectClass: "effect-general", extraText: "👎👎👎", img: "15157.jpg", rate: 65.0 },
+        { id: 1, name: "크로노스 인페르노", rarity: "희귀", effectClass: "effect-rare", extraText: "파란색 기운", img: "15158.jpg", rate: 15.0 },
+        { id: 2, name: "이클립스", rarity: "영웅", effectClass: "effect-epic", extraText: "보라색 오라", img: "15159.jpg", rate: 10.0 },
+        { id: 3, name: "불칼", rarity: "전설", effectClass: "effect-legendary", extraText: "⭐️⭐️⭐️⭐️", img: "15161.jpg", rate: 7.5 },
+        { id: 4, name: "일렉시아스", rarity: "신화", effectClass: "effect-myth", extraText: "🔥 불타는 신검 🔥", img: "15162.jpg", rate: 2.5 }
     ];
 
     let state = {
@@ -491,7 +458,7 @@
         inventory: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
     };
 
-    // 로컬 스토리지 불러오기
+    // 로컬 스토리지 자동 저장 및 불러오기
     function loadGameData() {
         const saved = localStorage.getItem('donghee_gacha_save');
         if (saved) {
@@ -506,10 +473,8 @@
 
     function saveGameData() {
         localStorage.setItem('donghee_gacha_save', JSON.stringify(state));
-        showToast("💾 데이터가 안전하게 저장되었다!");
     }
 
-    // Web Audio API 효과음 생성 (자동 재생)
     let audioCtx = null;
     function initAudioUser() {
         if (!audioCtx) {
@@ -520,7 +485,7 @@
         }
     }
 
-    function playEpicSound(isHigh) {
+    function playSound(isHigh) {
         initAudioUser();
         if (!audioCtx) return;
         const now = audioCtx.currentTime;
@@ -558,10 +523,11 @@
         return weapons[0];
     }
 
-    let flipTimer = null;
-    let isFlipped = true;
+    let isBusy = false;
 
-    function pullWeapon(count) {
+    // 뽑기 시작 (1회 또는 10회 연속 연출)
+    async function startPull(count) {
+        if (isBusy) return;
         initAudioUser();
         const cost = count === 10 ? 1000 : 100;
         if (state.gold < cost) {
@@ -569,84 +535,73 @@
             return;
         }
 
-        state.gold -= cost;
-        state.totalPulls += count;
+        isBusy = true;
+        document.getElementById('btnSingle').disabled = true;
+        document.getElementById('btnMulti').disabled = true;
 
-        if (count === 1) {
-            playEpicSound(false);
+        state.gold -= cost;
+        updateUI();
+
+        // 10회 뽑기면 결과 10개를 미리 뽑아둠
+        let pullQueue = [];
+        for (let i = 0; i < count; i++) {
             const w = getRandomWeapon();
             state.inventory[w.id]++;
-
-            // 카드 뒤집기 연출 준비 (뒷면으로 세팅)
-            const cardContainer = document.getElementById('mainCard');
-            cardContainer.classList.remove('flipped');
-            isFlipped = false;
-
-            document.getElementById('weaponImg').src = w.img;
-            const badge = document.getElementById('weaponRarity');
-            badge.innerText = w.rarity;
-            badge.className = `rarity-badge ${w.badgeClass}`;
-            document.getElementById('weaponName').innerText = w.name;
-
-            if (w.id >= 3) {
-                playEpicSound(true);
-                showToast(`🔥 대박! [${w.name}] 득템!`);
-            }
-
-            // 1초 뒤 자동 뒤집기
-            clearTimeout(flipTimer);
-            flipTimer = setTimeout(() => {
-                if (!isFlipped) {
-                    cardContainer.classList.add('flipped');
-                    isFlipped = true;
-                }
-            }, 1000);
-
-        } else {
-            // 10연차 처리 (각각 랜덤 1개씩 10개 뽑기)
-            playEpicSound(true);
-            let results = [];
-            let highestId = 0;
-            for (let i = 0; i < 10; i++) {
-                const w = getRandomWeapon();
-                state.inventory[w.id]++;
-                results.push(w);
-                if (w.id > highestId) highestId = w.id;
-            }
-
-            // 10연차 결과 모달 표시
-            const grid = document.getElementById('multiResultGrid');
-            grid.innerHTML = '';
-            results.forEach(w => {
-                const div = document.createElement('div');
-                div.className = `multi-item ${w.badgeClass}`;
-                div.innerHTML = `
-                    <div style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; flex-shrink:0;">
-                        <img src="${w.img}" style="width:100%; height:100%; object-fit:cover;">
-                    </div>
-                    <div style="overflow:hidden;">
-                        <div style="font-size: 12px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${w.name}</div>
-                        <div style="font-size: 10px; opacity: 0.8;">${w.rarity}</div>
-                    </div>
-                `;
-                grid.appendChild(div);
-            });
-            openModal('multiModal');
-            showToast("✨ 10연차 뽑기 완료!");
+            pullQueue.push(w);
         }
 
-        updateUI();
+        state.totalPulls += count;
         saveGameData();
         updateInventoryGrid();
+
+        // 차례대로 카드 1개씩 연출 재생
+        for (let i = 0; i < pullQueue.length; i++) {
+            await playSingleCardAnimation(pullQueue[i], i + 1, count);
+        }
+
+        isBusy = false;
+        document.getElementById('btnSingle').disabled = false;
+        document.getElementById('btnMulti').disabled = false;
+    }
+
+    // 단일 카드 연출 함수 (1회 및 10회에서 각각 하나씩 순서대로 실행)
+    function playSingleCardAnimation(w, currentIdx, totalCount) {
+        return new Promise((resolve) => {
+            playSound(w.id >= 3);
+
+            const cardContainer = document.getElementById('mainCard');
+            const cardFrontBox = document.getElementById('cardFrontBox');
+            const extraText = document.getElementById('extraEffectText');
+            const weaponName = document.getElementById('weaponName');
+
+            // 1. 초기화: 카드 뒤집힌 상태로 설정하고 이름/효과 감추기
+            cardContainer.classList.remove('flipped');
+            weaponName.innerText = totalCount > 1 ? `(${currentIdx}/${totalCount}) ???` : "???";
+            extraText.innerText = "";
+            cardFrontBox.className = "card-front";
+            document.getElementById('weaponImg').src = w.img;
+
+            // 0.5초 뒤 카드 테두리 및 효과 적용 후 자동 뒤집기
+            setTimeout(() => {
+                cardFrontBox.className = `card-front ${w.effectClass}`;
+                extraText.innerText = w.extraText;
+                cardContainer.classList.add('flipped');
+                weaponName.innerText = totalCount > 1 ? `(${currentIdx}/${totalCount}) ${w.name}` : w.name;
+
+                if (w.id >= 3) {
+                    showToast(`🔥 [${w.name}] 득템!`);
+                }
+
+                // 1초간 보여준 후 다음으로 진행
+                setTimeout(() => {
+                    resolve();
+                }, 1200);
+            }, 600);
+        });
     }
 
     function flipCardManual() {
-        const cardContainer = document.getElementById('mainCard');
-        if (!isFlipped) {
-            cardContainer.classList.add('flipped');
-            isFlipped = true;
-            clearTimeout(flipTimer);
-        }
+        // 수동 클릭 시 즉시 공개 기능 필요시 활용
     }
 
     function updateUI() {
@@ -661,7 +616,7 @@
         weapons.forEach(w => {
             const count = state.inventory[w.id];
             const div = document.createElement('div');
-            div.className = `inv-item ${w.badgeClass}`;
+            div.className = `inv-item ${w.rarity === '일반' ? 'grade-general' : w.rarity === '희귀' ? 'grade-rare' : w.rarity === '영웅' ? 'grade-epic' : w.rarity === '전설' ? 'grade-legendary' : 'grade-myth'}`;
             div.innerHTML = `
                 <div class="inv-count">${count}개</div>
                 <div style="width: 55px; height: 55px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
@@ -678,7 +633,7 @@
         const toast = document.getElementById('toast');
         toast.innerText = msg;
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2000);
+        setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
     function openModal(id) {
