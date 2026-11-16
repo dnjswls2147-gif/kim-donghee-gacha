@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>김동희 세계관 칼 뽑기</title>
+    <title>김동희 세계관 칼 뽑기 & 훈련장</title>
     <style>
         * {
             box-sizing: border-box;
@@ -20,7 +20,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         .container {
@@ -35,6 +35,19 @@
             position: relative;
         }
 
+        /* 화면 전환용 클래스 */
+        .screen {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            flex-grow: 1;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -42,13 +55,8 @@
             margin-bottom: 15px;
         }
 
-        .title-area {
-            text-align: center;
-            flex-grow: 1;
-        }
-
         .title-area h1 {
-            font-size: 20px;
+            font-size: 18px;
             background: linear-gradient(45deg, #ffcc00, #ff5555, #cc44ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -71,25 +79,13 @@
             background: rgba(26, 31, 51, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 10px;
+            margin-bottom: 12px;
         }
 
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #8b9bb4;
-        }
-
-        .stat-value {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ffd700;
-            margin-top: 2px;
-        }
+        .stat-item { text-align: center; }
+        .stat-label { font-size: 10px; color: #8b9bb4; }
+        .stat-value { font-size: 15px; font-weight: bold; color: #ffd700; margin-top: 2px; }
 
         .gacha-screen {
             flex-grow: 1;
@@ -102,18 +98,16 @@
             justify-content: center;
             padding: 20px;
             position: relative;
-            margin-bottom: 15px;
-            min-height: 280px;
+            margin-bottom: 12px;
+            min-height: 250px;
         }
 
-        /* 카드 뒤집기 스타일 */
         .card-container {
             perspective: 1000px;
-            width: 150px;
-            height: 150px;
-            margin-bottom: 12px;
+            width: 140px;
+            height: 140px;
+            margin-bottom: 10px;
             cursor: pointer;
-            position: relative;
         }
 
         .card-inner {
@@ -142,107 +136,52 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
-        .card-back {
-            background: linear-gradient(135deg, #2b324b, #1a1f33);
-            font-size: 32px;
-            color: #ffd700;
-        }
+        .card-back { background: linear-gradient(135deg, #2b324b, #1a1f33); font-size: 30px; color: #ffd700; }
+        .card-front { background: #222840; transform: rotateY(180deg); overflow: hidden; }
+        .card-front img { width: 100%; height: 100%; object-fit: cover; }
 
-        .card-front {
-            background: #222840;
-            transform: rotateY(180deg);
-            overflow: hidden;
-        }
+        .effect-general { border-color: #718096; }
+        .effect-rare { border-color: #3182ce; }
+        .effect-epic { border-color: #805ad5; }
+        .effect-legendary { border-color: #ecc94b; }
+        .effect-myth { border-color: #e53e3e; }
 
-        .card-front img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* 등급별 특수 효과 디자인 */
-        .effect-general { border-color: #718096; box-shadow: 0 0 15px rgba(113,128,150,0.4); }
-        .effect-rare { border-color: #3182ce; box-shadow: 0 0 20px rgba(49,130,206,0.6); }
-        .effect-epic { border-color: #805ad5; box-shadow: 0 0 20px rgba(128,90,213,0.6); }
-        .effect-legendary { border-color: #ecc94b; box-shadow: 0 0 25px rgba(236,201,75,0.8); }
-        .effect-myth { 
-            border-color: #e53e3e; 
-            box-shadow: 0 0 30px rgba(229,62,62,0.9);
-            animation: fireGlow 1.5s infinite alternate;
-        }
-
-        @keyframes fireGlow {
-            0% { box-shadow: 0 0 15px #e53e3e, inset 0 0 10px #ff8787; }
-            100% { box-shadow: 0 0 30px #ff4d4d, inset 0 0 20px #ff6b6b; }
-        }
-
-        .extra-badge-text {
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 6px;
-            min-height: 20px;
-            text-align: center;
-        }
-
-        .weapon-name {
-            font-size: 22px;
-            font-weight: 900;
-            margin-bottom: 10px;
-            text-align: center;
-            min-height: 30px;
-        }
+        .extra-badge-text { font-size: 12px; font-weight: bold; margin-bottom: 4px; min-height: 18px; text-align: center; }
+        .weapon-name { font-size: 20px; font-weight: 900; margin-bottom: 8px; text-align: center; min-height: 25px; }
 
         .action-buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: none;
-            border-radius: 14px;
-            font-size: 15px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .btn-single {
-            background: linear-gradient(135deg, #ff8008 0%, #ffc837 100%);
-            color: #1a1a1a;
-        }
+        .btn-single { background: linear-gradient(135deg, #ff8008 0%, #ffc837 100%); color: #1a1a1a; }
+        .btn-row { display: flex; gap: 8px; }
+        .btn-multi { flex: 2; background: linear-gradient(135deg, #7928ca 0%, #b800ff 100%); color: #fff; }
+        .btn-inventory { flex: 1; background: #2b324b; color: #fff; border: 1px solid #48537a; }
+        .btn-training { background: linear-gradient(135deg, #00b09b, #96c93d); color: #fff; }
 
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-multi {
-            flex: 2;
-            background: linear-gradient(135deg, #7928ca 0%, #b800ff 100%);
-            color: #fff;
-        }
-
-        .btn-inventory {
-            flex: 1;
-            background: #2b324b;
-            color: #fff;
-            border: 1px solid #48537a;
-        }
-
+        /* 모달 스타일 */
         .modal {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(11, 13, 20, 0.95);
             z-index: 100;
             display: none;
@@ -254,153 +193,195 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 1px solid #2a3352;
-            padding-bottom: 12px;
+            padding-bottom: 10px;
         }
 
-        .modal-header h2 {
-            font-size: 18px;
-            color: #ffd700;
-        }
+        .modal-header h2 { font-size: 16px; color: #ffd700; }
+        .modal-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+        .modal-body { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
 
-        .modal-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 22px;
-            cursor: pointer;
-        }
+        .rate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .rate-table th, .rate-table td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .rate-table th { color: #8b9bb4; background: rgba(255,255,255,0.03); }
 
-        .modal-body {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .rate-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .rate-table th, .rate-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .rate-table th {
-            color: #8b9bb4;
-            background: rgba(255,255,255,0.03);
-        }
-
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
+        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .inv-item {
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             position: relative;
         }
-
-        .inv-count {
-            position: absolute;
-            top: 8px;
-            right: 10px;
+        .inv-count { position: absolute; top: 6px; right: 8px; font-size: 10px; background: rgba(0,0,0,0.6); padding: 2px 5px; border-radius: 4px; color: #ffd700; }
+        
+        .btn-equip {
+            margin-top: 6px;
+            padding: 4px 10px;
             font-size: 11px;
-            background: rgba(0,0,0,0.6);
-            padding: 2px 6px;
             border-radius: 6px;
-            color: #ffd700;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .equipped-badge { font-size: 10px; color: #ffeb3b; font-weight: bold; margin-top: 4px; }
+
+        /* 훈련장 캔버스 화면 스타일 (하늘 위 정사각형 맵 & 브롤스타즈 스타일 조작계) */
+        #trainingScreen {
+            background: #1a233a;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* 인벤토리 등급별 색상 */
-        .grade-general { background: #4a5568; color: #fff; border: 1px solid #718096; }
-        .grade-rare { background: #2b6cb0; color: #fff; border: 1px solid #3182ce; }
-        .grade-epic { background: #6b46c1; color: #fff; border: 1px solid #805ad5; }
-        .grade-legendary { background: #d69e2e; color: #fff; border: 1px solid #ecc94b; }
-        .grade-myth { background: #9b2c2c; color: #fff; border: 1px solid #e53e3e; }
+        #gameCanvas {
+            background: linear-gradient(135deg, #3a6073, #16222a);
+            display: block;
+            margin: auto;
+            border: 4px solid #4a5580;
+            border-radius: 12px;
+        }
+
+        .training-ui-top {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .joystick-zone {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            z-index: 10;
+            touch-action: none;
+        }
+
+        .joystick-knob {
+            position: absolute;
+            top: 35px;
+            left: 35px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .brawl-btns {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .brawl-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
+
+        .btn-attack { background: #ff3b30; }
+        .btn-skill { background: #ffcc00; color: #000; }
+        .btn-dash { background: #007aff; }
 
         #toast {
             position: fixed;
-            top: 20px;
-            left: 50%;
+            top: 20px; left: 50%;
             transform: translateX(-50%) translateY(-50px);
             background: linear-gradient(135deg, #00b09b, #96c93d);
             color: #fff;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             transition: transform 0.3s ease;
             z-index: 1000;
-            pointer-events: none;
             opacity: 0;
         }
-
-        #toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body onclick="initAudioUser()">
 
 <div class="container">
-    <div class="header">
-        <button class="btn-icon" onclick="openModal('rateModal')">📊 확률표</button>
-        <div class="title-area">
-            <h1>김동희 세계관 칼 뽑기</h1>
+    <!-- 메인 가챠 화면 -->
+    <div id="mainScreen" class="screen">
+        <div class="header">
+            <button class="btn-icon" onclick="openModal('rateModal')">📊 확률표</button>
+            <div class="title-area"><h1>김동희 세계관 칼 뽑기</h1></div>
+            <div style="width: 40px;"></div>
         </div>
-        <div style="width: 50px;"></div>
-    </div>
 
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-label">총 뽑기 횟수</div>
-            <div class="stat-value" id="totalPulls">0회</div>
+        <div class="stats-bar">
+            <div class="stat-item"><div class="stat-label">총 뽑기 횟수</div><div class="stat-value" id="totalPulls">0회</div></div>
+            <div class="stat-item"><div class="stat-label">보유 골드</div><div class="stat-value" id="goldCount">💰 10,000</div></div>
         </div>
-        <div class="stat-item">
-            <div class="stat-label">보유 골드</div>
-            <div class="stat-value" id="goldCount">💰 10,000</div>
-        </div>
-    </div>
 
-    <div class="gacha-screen" id="gachaScreen">
-        <div class="card-container" id="mainCard" onclick="flipCardManual()">
-            <div class="card-inner" id="cardInner">
-                <div class="card-back">⚔️</div>
-                <div class="card-front" id="cardFrontBox">
-                    <img id="weaponImg" src="15157.jpg" alt="무기 이미지">
+        <div class="gacha-screen">
+            <div class="card-container" id="mainCard">
+                <div class="card-inner" id="cardInner">
+                    <div class="card-back">⚔️</div>
+                    <div class="card-front" id="cardFrontBox">
+                        <img id="weaponImg" src="15157.jpg" alt="무기">
+                    </div>
                 </div>
             </div>
+            <div class="extra-badge-text" id="extraEffectText"></div>
+            <div class="weapon-name" id="weaponName">???</div>
         </div>
-        <div class="extra-badge-text" id="extraEffectText"></div>
-        <div class="weapon-name" id="weaponName">???</div>
+
+        <div class="action-buttons">
+            <button class="btn btn-single" onclick="startPull(1)" id="btnSingle">⚔️ 단차 뽑기 (1회: 100골드)</button>
+            <div class="btn-row">
+                <button class="btn btn-multi" onclick="startPull(10)" id="btnMulti">✨ 10연차 뽑기 (1,000골드)</button>
+                <button class="btn btn-inventory" onclick="openModal('invModal')">🎒 보관함</button>
+            </div>
+            <button class="btn btn-training" onclick="enterTraining()">🏟️ 훈련장으로 가기</button>
+        </div>
     </div>
 
-    <div class="action-buttons">
-        <button class="btn btn-single" onclick="startPull(1)" id="btnSingle">
-            ⚔️ 단차 뽑기 (1회: 100골드)
-        </button>
-        <div class="btn-row">
-            <button class="btn btn-multi" onclick="startPull(10)" id="btnMulti">
-                ✨ 10연차 뽑기 (1,000골드)
-            </button>
-            <button class="btn btn-inventory" onclick="openModal('invModal')">
-                🎒 보관함
-            </button>
+    <!-- 훈련장 화면 (하늘 위 정사각형 맵 & 브롤스타즈 조작) -->
+    <div id="trainingScreen" class="screen hidden">
+        <div class="training-ui-top">
+            <button class="btn-icon" onclick="exitTraining()">⬅️ 나가기</button>
+            <div style="font-size: 13px; font-weight: bold; color: #ffd700;" id="equippedDisplay">장착 무기: 없음</div>
+        </div>
+        
+        <canvas id="gameCanvas" width="380" height="380"></canvas>
+
+        <!-- 브롤스타즈 조작계 -->
+        <div class="joystick-zone" id="joystickZone">
+            <div class="joystick-knob" id="joystickKnob"></div>
+        </div>
+        <div class="brawl-btns">
+            <div class="brawl-btn btn-dash" onclick="playerDash()">💨</div>
+            <div class="brawl-btn btn-skill" onclick="playerSkill()">💥</div>
+            <div class="brawl-btn btn-attack" onclick="playerAttack()">⚔️</div>
         </div>
     </div>
 </div>
@@ -413,12 +394,7 @@
     </div>
     <div class="modal-body">
         <table class="rate-table">
-            <thead>
-                <tr>
-                    <th>칼 이름 : 확률</th>
-                    <th style="text-align: right;">비율</th>
-                </tr>
-            </thead>
+            <thead><tr><th>칼 이름 : 확률</th><th style="text-align: right;">비율</th></tr></thead>
             <tbody>
                 <tr><td>나무 뭉둥이 (일반)</td><td style="text-align: right; color:#a0aec0;">65.0%</td></tr>
                 <tr><td>크로노스 인페르노 (희귀)</td><td style="text-align: right; color:#3182ce;">15.0%</td></tr>
@@ -430,10 +406,10 @@
     </div>
 </div>
 
-<!-- 인벤토리 모달 -->
+<!-- 인벤토리 모달 (장착하기/장착해제 포함) -->
 <div class="modal" id="invModal">
     <div class="modal-header">
-        <h2>보유한 무기 보관함</h2>
+        <h2>보유한 무기 보관함 (최대 1개 장착)</h2>
         <button class="modal-close" onclick="closeModal('invModal')">&times;</button>
     </div>
     <div class="modal-body">
@@ -445,20 +421,20 @@
 
 <script>
     const weapons = [
-        { id: 0, name: "나무 뭉둥이", rarity: "일반", effectClass: "effect-general", extraText: "👎👎👎", img: "15157.jpg", rate: 65.0 },
-        { id: 1, name: "크로노스 인페르노", rarity: "희귀", effectClass: "effect-rare", extraText: "파란색 기운", img: "15158.jpg", rate: 15.0 },
-        { id: 2, name: "이클립스", rarity: "영웅", effectClass: "effect-epic", extraText: "보라색 오라", img: "15159.jpg", rate: 10.0 },
-        { id: 3, name: "불칼", rarity: "전설", effectClass: "effect-legendary", extraText: "⭐️⭐️⭐️⭐️", img: "15161.jpg", rate: 7.5 },
-        { id: 4, name: "일렉시아스", rarity: "신화", effectClass: "effect-myth", extraText: "🔥 불타는 신검 🔥", img: "15162.jpg", rate: 2.5 }
+        { id: 0, name: "나무 뭉둥이", rarity: "일반", effectClass: "effect-general", extraText: "👎👎👎", img: "15157.jpg", rate: 65.0, skillName: "퍽퍽 휘두르기" },
+        { id: 1, name: "크로노스 인페르노", rarity: "희귀", effectClass: "effect-rare", extraText: "파란색 기운", img: "15158.jpg", rate: 15.0, skillName: "시간 폭발" },
+        { id: 2, name: "이클립스", rarity: "영웅", effectClass: "effect-epic", extraText: "보라색 오라", img: "15159.jpg", rate: 10.0, skillName: "어둠의 참격" },
+        { id: 3, name: "불칼", rarity: "전설", effectClass: "effect-legendary", extraText: "⭐️⭐️⭐️⭐️", img: "15161.jpg", rate: 7.5, skillName: "화염 폭풍" },
+        { id: 4, name: "일렉시아스", rarity: "신화", effectClass: "effect-myth", extraText: "🔥 불타는 신검 🔥", img: "15162.jpg", rate: 2.5, skillName: "번개 낙하" }
     ];
 
     let state = {
         totalPulls: 0,
         gold: 10000,
-        inventory: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
+        inventory: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
+        equippedWeaponId: null
     };
 
-    // 로컬 스토리지 자동 저장 및 불러오기
     function loadGameData() {
         const saved = localStorage.getItem('donghee_gacha_save');
         if (saved) {
@@ -467,6 +443,7 @@
                 state.totalPulls = parsed.totalPulls || 0;
                 state.gold = parsed.gold !== undefined ? parsed.gold : 10000;
                 state.inventory = parsed.inventory || { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
+                state.equippedWeaponId = parsed.equippedWeaponId !== undefined ? parsed.equippedWeaponId : null;
             } catch(e) {}
         }
     }
@@ -477,12 +454,8 @@
 
     let audioCtx = null;
     function initAudioUser() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
     function playSound(isHigh) {
@@ -493,23 +466,20 @@
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
         if (isHigh) {
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(300, now);
             osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
             gain.gain.setValueAtTime(0.4, now);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-            osc.start(now);
-            osc.stop(now + 0.5);
+            osc.start(now); osc.stop(now + 0.5);
         } else {
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(150, now);
             osc.frequency.exponentialRampToValueAtTime(400, now + 0.2);
             gain.gain.setValueAtTime(0.3, now);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-            osc.start(now);
-            osc.stop(now + 0.25);
+            osc.start(now); osc.stop(now + 0.25);
         }
     }
 
@@ -525,7 +495,6 @@
 
     let isBusy = false;
 
-    // 뽑기 시작 (1회 또는 10회 연속 연출)
     async function startPull(count) {
         if (isBusy) return;
         initAudioUser();
@@ -542,7 +511,6 @@
         state.gold -= cost;
         updateUI();
 
-        // 10회 뽑기면 결과 10개를 미리 뽑아둠
         let pullQueue = [];
         for (let i = 0; i < count; i++) {
             const w = getRandomWeapon();
@@ -554,7 +522,6 @@
         saveGameData();
         updateInventoryGrid();
 
-        // 차례대로 카드 1개씩 연출 재생
         for (let i = 0; i < pullQueue.length; i++) {
             await playSingleCardAnimation(pullQueue[i], i + 1, count);
         }
@@ -564,49 +531,52 @@
         document.getElementById('btnMulti').disabled = false;
     }
 
-    // 단일 카드 연출 함수 (1회 및 10회에서 각각 하나씩 순서대로 실행)
     function playSingleCardAnimation(w, currentIdx, totalCount) {
         return new Promise((resolve) => {
             playSound(w.id >= 3);
-
             const cardContainer = document.getElementById('mainCard');
             const cardFrontBox = document.getElementById('cardFrontBox');
             const extraText = document.getElementById('extraEffectText');
             const weaponName = document.getElementById('weaponName');
 
-            // 1. 초기화: 카드 뒤집힌 상태로 설정하고 이름/효과 감추기
             cardContainer.classList.remove('flipped');
             weaponName.innerText = totalCount > 1 ? `(${currentIdx}/${totalCount}) ???` : "???";
             extraText.innerText = "";
             cardFrontBox.className = "card-front";
             document.getElementById('weaponImg').src = w.img;
 
-            // 0.5초 뒤 카드 테두리 및 효과 적용 후 자동 뒤집기
             setTimeout(() => {
                 cardFrontBox.className = `card-front ${w.effectClass}`;
                 extraText.innerText = w.extraText;
                 cardContainer.classList.add('flipped');
                 weaponName.innerText = totalCount > 1 ? `(${currentIdx}/${totalCount}) ${w.name}` : w.name;
-
-                if (w.id >= 3) {
-                    showToast(`🔥 [${w.name}] 득템!`);
-                }
-
-                // 1초간 보여준 후 다음으로 진행
-                setTimeout(() => {
-                    resolve();
-                }, 1200);
+                if (w.id >= 3) showToast(`🔥 [${w.name}] 득템!`);
+                setTimeout(() => resolve(), 1200);
             }, 600);
         });
-    }
-
-    function flipCardManual() {
-        // 수동 클릭 시 즉시 공개 기능 필요시 활용
     }
 
     function updateUI() {
         document.getElementById('totalPulls').innerText = state.totalPulls + "회";
         document.getElementById('goldCount').innerText = "💰 " + state.gold.toLocaleString();
+    }
+
+    function equipWeapon(id) {
+        if (state.inventory[id] <= 0) {
+            showToast("⚠️ 보유하지 않은 칼이다!");
+            return;
+        }
+        state.equippedWeaponId = id;
+        saveGameData();
+        updateInventoryGrid();
+        showToast(`✨ [${weapons[id].name}] 장착 완료!`);
+    }
+
+    function unequipWeapon() {
+        state.equippedWeaponId = null;
+        saveGameData();
+        updateInventoryGrid();
+        showToast("장착 해제 완료!");
     }
 
     function updateInventoryGrid() {
@@ -615,15 +585,17 @@
 
         weapons.forEach(w => {
             const count = state.inventory[w.id];
+            const isEquipped = state.equippedWeaponId === w.id;
             const div = document.createElement('div');
             div.className = `inv-item ${w.rarity === '일반' ? 'grade-general' : w.rarity === '희귀' ? 'grade-rare' : w.rarity === '영웅' ? 'grade-epic' : w.rarity === '전설' ? 'grade-legendary' : 'grade-myth'}`;
             div.innerHTML = `
                 <div class="inv-count">${count}개</div>
-                <div style="width: 55px; height: 55px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
+                <div style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; margin-bottom: 4px;">
                     <img src="${w.img}" style="width:100%; height:100%; object-fit:cover;">
                 </div>
-                <div style="font-size: 13px; font-weight: bold; white-space: nowrap;">${w.name}</div>
-                <div style="font-size: 10px; margin-top: 2px; opacity: 0.9;">${w.rarity}</div>
+                <div style="font-size: 12px; font-weight: bold;">${w.name}</div>
+                ${isEquipped ? '<div class="equipped-badge">장착중 [최대1개]</div>' : ''}
+                ${count > 0 ? (isEquipped ? `<button class="btn-equip" style="background:#e53e3e; color:#fff;" onclick="unequipWeapon()">장착 해제</button>` : `<button class="btn-equip" style="background:#3182ce; color:#fff;" onclick="equipWeapon(${w.id})">장착하기</button>`) : ''}
             `;
             grid.appendChild(div);
         });
@@ -641,8 +613,164 @@
         if (id === 'invModal') updateInventoryGrid();
     }
 
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // --- 훈련장 게임 로직 ---
+    let canvas, ctx;
+    let player = { x: 190, y: 190, radius: 18, speed: 3, color: '#00ffcc' };
+    let robots = [];
+    let joystick = { active: false, x: 0, y: 0, dx: 0, dy: 0 };
+    let gameInterval = null;
+    let playerImg = new Image();
+    playerImg.src = '15194.png'; // 첫 번째 사진 캐릭터
+
+    function enterTraining() {
+        document.getElementById('mainScreen').classList.add('hidden');
+        document.getElementById('trainingScreen').classList.remove('hidden');
+
+        const eqName = state.equippedWeaponId !== null ? weapons[state.equippedWeaponId].name + " (" + weapons[state.equippedWeaponId].skillName + ")" : "없음 (맨손)";
+        document.getElementById('equippedDisplay').innerText = "장착 무기: " + eqName;
+
+        canvas = document.getElementById('gameCanvas');
+        ctx = canvas.getContext('2d');
+
+        // 로봇 배치 (왼쪽 3명, 오른쪽 3명)
+        robots = [];
+        // 왼쪽 3명
+        for (let i = 0; i < 3; i++) {
+            robots.push({ x: 70, y: 100 + i * 90, radius: 16, hp: 99999, maxHp: 99999 });
+        }
+        // 오른쪽 3명
+        for (let i = 0; i < 3; i++) {
+            robots.push({ x: 310, y: 100 + i * 90, radius: 16, hp: 99999, maxHp: 99999 });
+        }
+
+        setupJoystick();
+        if (gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(updateGame, 1000 / 60);
+    }
+
+    function exitTraining() {
+        if (gameInterval) clearInterval(gameInterval);
+        document.getElementById('trainingScreen').classList.add('hidden');
+        document.getElementById('mainScreen').classList.remove('hidden');
+    }
+
+    function setupJoystick() {
+        const zone = document.getElementById('joystickZone');
+        const knob = document.getElementById('joystickKnob');
+        let rect = zone.getBoundingClientRect();
+        let center = { x: 60, y: 60 };
+
+        function handleStart(e) {
+            joystick.active = true;
+            handleMove(e);
+        }
+
+        function handleMove(e) {
+            if (!joystick.active) return;
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            rect = zone.getBoundingClientRect();
+            let x = clientX - rect.left - center.x;
+            let y = clientY - rect.top - center.y;
+            let dist = Math.sqrt(x * x + y * y);
+            let maxDist = 40;
+
+            if (dist > maxDist) {
+                x = (x / dist) * maxDist;
+                y = (y / dist) * maxDist;
+            }
+
+            knob.style.transform = `translate(${x}px, ${y}px)`;
+            joystick.dx = x / maxDist;
+            joystick.dy = y / maxDist;
+        }
+
+        function handleEnd() {
+            joystick.active = false;
+            joystick.dx = 0;
+            joystick.dy = 0;
+            knob.style.transform = `translate(0px, 0px)`;
+        }
+
+        zone.addEventListener('touchstart', handleStart);
+        window.addEventListener('touchmove', handleMove);
+        window.addEventListener('touchend', handleEnd);
+        zone.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+    }
+
+    function updateGame() {
+        // 플레이어 이동
+        player.x += joystick.dx * player.speed;
+        player.y += joystick.dy * player.speed;
+
+        // 정사각형 맵 경계 제한
+        player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
+        player.y = Math.max(player.radius, Math.min(canvas.height - player.radius, player.y));
+
+        // 화면 렌더링
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 하늘 위 맵 테두리 효과
+        ctx.strokeStyle = '#68d391';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+        // 로봇 6명 렌더링 (공격 안 함, 피 무제한)
+        robots.forEach(r => {
+            ctx.beginPath();
+            ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff5555';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
+            ctx.closePath();
+
+            // 로봇 체력바
+            ctx.fillStyle = '#000';
+            ctx.fillRect(r.x - 18, r.y - 26, 36, 5);
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(r.x - 18, r.y - 26, 36, 5);
+        });
+
+        // 내 캐릭터 렌더링 (첫 번째 사진 적용)
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(playerImg, player.x - player.radius, player.y - player.radius, player.radius * 2, player.radius * 2);
+        ctx.restore();
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#00ffcc';
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // 칼별 스킬 및 공격 액션
+    function playerAttack() {
+        showToast("⚔️ 기본 공격!");
+    }
+
+    function playerDash() {
+        showToast("💨 대쉬!");
+        // 순간 이동 효과
+        player.x += joystick.dx * 50;
+        player.y += joystick.dy * 50;
+    }
+
+    function playerSkill() {
+        if (state.equippedWeaponId === null) {
+            showToast("⚠️ 장착한 칼이 없다! 맨손 스킬!");
+            return;
+        }
+        const w = weapons[state.equippedWeaponId];
+        showToast(`💥 스킬 발동: [${w.skillName}]!`);
     }
 
     // 초기 실행
