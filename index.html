@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>김동희 세계관 칼 뽑기 & 훈련장</title>
     <style>
         * {
@@ -11,6 +11,7 @@
             padding: 0;
             font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
@@ -21,6 +22,7 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .container {
@@ -106,7 +108,6 @@
             width: 140px;
             height: 140px;
             margin-bottom: 10px;
-            cursor: pointer;
         }
 
         .card-inner {
@@ -114,12 +115,7 @@
             width: 100%;
             height: 100%;
             text-align: center;
-            transition: transform 0.6s;
             transform-style: preserve-3d;
-        }
-
-        .card-container.flipped .card-inner {
-            transform: rotateY(180deg);
         }
 
         .card-front, .card-back {
@@ -136,7 +132,7 @@
         }
 
         .card-back { background: linear-gradient(135deg, #2b324b, #1a1f33); font-size: 30px; color: #ffd700; }
-        .card-front { background: #222840; transform: rotateY(180deg); overflow: hidden; }
+        .card-front { background: #222840; overflow: hidden; }
         .card-front img { width: 100%; height: 100%; object-fit: cover; }
 
         .effect-general { border-color: #718096; }
@@ -176,7 +172,7 @@
         .btn-inventory { flex: 1; background: #2b324b; color: #fff; border: 1px solid #48537a; }
         .btn-training { background: linear-gradient(135deg, #00b09b, #96c93d); color: #fff; }
 
-        /* 모달 스타일 */
+        /* 모달 스타일 (스크롤 지원) */
         .modal {
             position: absolute;
             top: 0; left: 0;
@@ -195,15 +191,38 @@
             margin-bottom: 15px;
             border-bottom: 1px solid #2a3352;
             padding-bottom: 10px;
+            flex-shrink: 0;
         }
 
         .modal-header h2 { font-size: 16px; color: #ffd700; }
         .modal-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
-        .modal-body { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .modal-body { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
 
         .rate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .rate-table th, .rate-table td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .rate-table th { color: #8b9bb4; background: rgba(255,255,255,0.03); }
+
+        .inventory-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .btn-sell-all {
+            background: #e53e3e;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
         .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .inv-item {
@@ -230,6 +249,21 @@
         .btn-equip { background: #3182ce; color: #fff; }
         .btn-sell { background: #dd6b20; color: #fff; }
         .equipped-badge { font-size: 10px; color: #ffeb3b; font-weight: bold; margin-top: 4px; }
+
+        /* 10연차 결과 모달 그리드 */
+        .multi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .multi-item {
+            background: #1a1f33;
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         /* 훈련장 화면 */
         #trainingScreen {
@@ -303,6 +337,7 @@
             color: #fff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             cursor: pointer;
+            touch-action: none;
         }
 
         .btn-attack { background: #ff3b30; width: 70px; height: 70px; font-size: 22px; }
@@ -343,22 +378,21 @@
         </div>
 
         <div class="gacha-screen">
-            <div class="card-container" id="mainCard">
+            <div class="card-container">
                 <div class="card-inner" id="cardInner">
-                    <div class="card-back">⚔️</div>
                     <div class="card-front" id="cardFrontBox">
                         <img id="weaponImg" src="15157.jpg" alt="무기">
                     </div>
                 </div>
             </div>
-            <div class="extra-badge-text" id="extraEffectText"></div>
-            <div class="weapon-name" id="weaponName">???</div>
+            <div class="extra-badge-text" id="extraEffectText">👎👎👎</div>
+            <div class="weapon-name" id="weaponName">나무 뭉둥이</div>
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-single" onclick="startPull(1)" id="btnSingle">⚔️ 단차 뽑기 (1회: 100골드)</button>
+            <button class="btn btn-single" onclick="pullWeapon(1)" id="btnSingle">⚔️ 단차 뽑기 (1회: 100골드)</button>
             <div class="btn-row">
-                <button class="btn btn-multi" onclick="startPull(10)" id="btnMulti">✨ 10연차 뽑기 (1,000골드)</button>
+                <button class="btn btn-multi" onclick="pullWeapon(10)" id="btnMulti">✨ 10연차 뽑기 (1,000골드)</button>
                 <button class="btn btn-inventory" onclick="openModal('invModal')">🎒 보관함</button>
             </div>
             <button class="btn btn-training" onclick="enterTraining()">🏟️ 훈련장으로 가기</button>
@@ -374,13 +408,13 @@
         
         <canvas id="gameCanvas" width="380" height="380"></canvas>
 
-        <!-- 브롤스타즈 스타일 조작계 (조이스틱 & 대시버튼 + 공격버튼) -->
+        <!-- 브롤스타즈 스타일 조작계 (조이스틱 & 조준선 대시 버튼 + 공격버튼) -->
         <div class="joystick-zone" id="joystickZone">
             <div class="joystick-knob" id="joystickKnob"></div>
         </div>
         <div class="brawl-btns">
             <div class="brawl-row">
-                <div class="brawl-btn btn-dash" onclick="playerDash()">💨</div>
+                <div class="brawl-btn btn-dash" id="dashBtn">💨</div>
             </div>
             <div class="brawl-row">
                 <div class="brawl-btn btn-attack" onclick="playerAttack()">⚔️</div>
@@ -409,14 +443,29 @@
     </div>
 </div>
 
-<!-- 인벤토리 모달 (장착/해제 및 판매하기 기능 포함) -->
+<!-- 인벤토리 모달 (스크롤 지원 및 모두 판매 버튼) -->
 <div class="modal" id="invModal">
     <div class="modal-header">
         <h2>보유한 무기 보관함 (최대 1개 장착)</h2>
         <button class="modal-close" onclick="closeModal('invModal')">&times;</button>
     </div>
     <div class="modal-body">
+        <div class="inventory-top-bar">
+            <span style="font-size: 12px; color: #ffd700;">전체 칼 일괄 판매</span>
+            <button class="btn-sell-all" onclick="sellAllWeapons()">모두 판매</button>
+        </div>
         <div class="inventory-grid" id="inventoryGrid"></div>
+    </div>
+</div>
+
+<!-- 10연차 즉시 결과 모달 -->
+<div class="modal" id="multiModal">
+    <div class="modal-header">
+        <h2>✨ 10연차 뽑기 결과</h2>
+        <button class="modal-close" onclick="closeModal('multiModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <div class="multi-grid" id="multiResultGrid"></div>
     </div>
 </div>
 
@@ -496,10 +545,8 @@
         return weapons[0];
     }
 
-    let isBusy = false;
-
-    async function startPull(count) {
-        if (isBusy) return;
+    // 뽑기 로직 (1회 및 10회 즉시 출력)
+    function pullWeapon(count) {
         initAudioUser();
         const cost = count === 10 ? 1000 : 100;
         if (state.gold < cost) {
@@ -507,56 +554,56 @@
             return;
         }
 
-        isBusy = true;
-        document.getElementById('btnSingle').disabled = true;
-        document.getElementById('btnMulti').disabled = true;
-
         state.gold -= cost;
-        updateUI();
+        state.totalPulls += count;
 
-        let pullQueue = [];
-        for (let i = 0; i < count; i++) {
+        if (count === 1) {
+            playSound(false);
             const w = getRandomWeapon();
             state.inventory[w.id]++;
-            pullQueue.push(w);
+
+            document.getElementById('weaponImg').src = w.img;
+            document.getElementById('cardFrontBox').className = `card-front ${w.effectClass}`;
+            document.getElementById('extraEffectText').innerText = w.extraText;
+            document.getElementById('weaponName').innerText = w.name;
+
+            if (w.id >= 3) {
+                playSound(true);
+                showToast(`🔥 [${w.name}] 득템!`);
+            }
+        } else {
+            // 10연차 즉시 결과 10개 출력
+            playSound(true);
+            let results = [];
+            for (let i = 0; i < 10; i++) {
+                const w = getRandomWeapon();
+                state.inventory[w.id]++;
+                results.push(w);
+            }
+
+            const grid = document.getElementById('multiResultGrid');
+            grid.innerHTML = '';
+            results.forEach(w => {
+                const div = document.createElement('div');
+                div.className = `multi-item`;
+                div.innerHTML = `
+                    <div style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; flex-shrink:0;">
+                        <img src="${w.img}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div style="overflow:hidden;">
+                        <div style="font-size: 12px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${w.name}</div>
+                        <div style="font-size: 10px; opacity: 0.8;">${w.rarity}</div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            openModal('multiModal');
+            showToast("✨ 10연차 즉시 뽑기 완료!");
         }
 
-        state.totalPulls += count;
+        updateUI();
         saveGameData();
         updateInventoryGrid();
-
-        for (let i = 0; i < pullQueue.length; i++) {
-            await playSingleCardAnimation(pullQueue[i], i + 1, count);
-        }
-
-        isBusy = false;
-        document.getElementById('btnSingle').disabled = false;
-        document.getElementById('btnMulti').disabled = false;
-    }
-
-    function playSingleCardAnimation(w, currentIdx, totalCount) {
-        return new Promise((resolve) => {
-            playSound(w.id >= 3);
-            const cardContainer = document.getElementById('mainCard');
-            const cardFrontBox = document.getElementById('cardFrontBox');
-            const extraText = document.getElementById('extraEffectText');
-            const weaponName = document.getElementById('weaponName');
-
-            cardContainer.classList.remove('flipped');
-            weaponName.innerText = totalCount > 1 ? `(${currentIdx}/${totalCount}) ???` : "???";
-            extraText.innerText = "";
-            cardFrontBox.className = "card-front";
-            document.getElementById('weaponImg').src = w.img;
-
-            setTimeout(() => {
-                cardFrontBox.className = `card-front ${w.effectClass}`;
-                extraText.innerText = w.extraText;
-                cardContainer.classList.add('flipped');
-                weaponName.innerText = totalCount > 1 ? `(${currentIdx}/${totalCount}) ${w.name}` : w.name;
-                if (w.id >= 3) showToast(`🔥 [${w.name}] 득템!`);
-                setTimeout(() => resolve(), 1200);
-            }, 600);
-        });
     }
 
     function updateUI() {
@@ -596,6 +643,24 @@
         updateUI();
         updateInventoryGrid();
         showToast(`💰 [${weapons[id].name}] 판매 완료 (+${weapons[id].sellPrice}골드)`);
+    }
+
+    // 모두 판매 기능
+    function sellAllWeapons() {
+        let totalGain = 0;
+        weapons.forEach(w => {
+            let count = state.inventory[w.id];
+            if (count > 0) {
+                totalGain += count * w.sellPrice;
+                state.inventory[w.id] = 0;
+            }
+        });
+        state.equippedWeaponId = null;
+        state.gold += totalGain;
+        saveGameData();
+        updateUI();
+        updateInventoryGrid();
+        showToast(`💰 모든 칼 일괄 판매 완료 (+${totalGain}골드)`);
     }
 
     function updateInventoryGrid() {
@@ -638,13 +703,20 @@
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // --- 훈련장 게임 로직 (디테일 업그레이드) ---
+    // --- 훈련장 게임 로직 (카메라 스크롤 & 브롤스타즈 에임 대시) ---
     let canvas, ctx;
-    let player = { x: 190, y: 190, radius: 18, speed: 3.5, angle: 0 };
+    let worldWidth = 800, worldHeight = 380; // 넓은 월드 맵
+    let camera = { x: 0, y: 0, width: 380, height: 380 };
+    let player = { x: 400, y: 190, radius: 18, speed: 3.5, angle: 0 };
     let robots = [];
     let projectiles = [];
-    let effects = []; // 불바다, 연기 등 특수 효과 배열
+    let effects = [];
     let joystick = { active: false, x: 0, y: 0, dx: 0, dy: 0 };
+    
+    // 대시 조준선 드래그 관련 변수
+    let dashAiming = false;
+    let dashAimAngle = 0;
+
     let gameInterval = null;
     let playerImg = new Image();
     playerImg.src = '15194.png';
@@ -659,18 +731,20 @@
         canvas = document.getElementById('gameCanvas');
         ctx = canvas.getContext('2d');
 
-        // 로봇 배치 (왼쪽 3명, 오른쪽 3명)
+        // 넓은 맵에 로봇들 배치
         robots = [];
-        for (let i = 0; i < 3; i++) {
-            robots.push({ x: 60, y: 90 + i * 100, radius: 16 });
+        for (let i = 0; i < 4; i++) {
+            robots.push({ x: 150 + i * 150, y: 90, radius: 16 });
         }
-        for (let i = 0; i < 3; i++) {
-            robots.push({ x: 320, y: 90 + i * 100, radius: 16 });
+        for (let i = 0; i < 4; i++) {
+            robots.push({ x: 150 + i * 150, y: 290, radius: 16 });
         }
 
+        player.x = 400; player.y = 190;
         projectiles = [];
         effects = [];
         setupJoystick();
+        setupDashAim();
 
         if (gameInterval) clearInterval(gameInterval);
         gameInterval = setInterval(updateGame, 1000 / 60);
@@ -725,14 +799,54 @@
         window.addEventListener('mouseup', handleEnd);
     }
 
+    // 브롤스타즈 스타일 조준선 대시 드래그 조작
+    function setupDashAim() {
+        const dashBtn = document.getElementById('dashBtn');
+
+        function onDashStart(e) {
+            dashAiming = true;
+            e.preventDefault();
+        }
+
+        function onDashMove(e) {
+            if (!dashAiming) return;
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let rect = dashBtn.getBoundingClientRect();
+            let bx = rect.left + rect.width / 2;
+            let by = rect.top + rect.height / 2;
+            dashAimAngle = Math.atan2(clientY - by, clientX - bx);
+        }
+
+        function onDashEnd() {
+            if (!dashAiming) return;
+            dashAiming = false;
+            // 대시 실행 (약 3칸 = 90픽셀 이동)
+            player.x += Math.cos(dashAimAngle) * 90;
+            player.y += Math.sin(dashAimAngle) * 90;
+            showToast("💨 브롤 대시 발동!");
+        }
+
+        dashBtn.addEventListener('touchstart', onDashStart);
+        window.addEventListener('touchmove', onDashMove);
+        window.addEventListener('touchend', onDashEnd);
+        dashBtn.addEventListener('mousedown', onDashStart);
+        window.addEventListener('mousemove', onDashMove);
+        window.addEventListener('mouseup', onDashEnd);
+    }
+
     function updateGame() {
         // 플레이어 이동
         player.x += joystick.dx * player.speed;
         player.y += joystick.dy * player.speed;
 
-        // 하늘 위 정사각형 맵 경계 제한
-        player.x = Math.max(player.radius + 15, Math.min(canvas.width - player.radius - 15, player.x));
-        player.y = Math.max(player.radius + 15, Math.min(canvas.height - player.radius - 15, player.y));
+        // 월드 맵 경계 제한
+        player.x = Math.max(player.radius + 15, Math.min(worldWidth - player.radius - 15, player.x));
+        player.y = Math.max(player.radius + 15, Math.min(worldHeight - player.radius - 15, player.y));
+
+        // 카메라가 플레이어를 부드럽게 따라가도록 설정 (좌우 이동 연동)
+        camera.x = player.x - camera.width / 2;
+        camera.x = Math.max(0, Math.min(worldWidth - camera.width, camera.x));
 
         // 투사체 업데이트
         projectiles.forEach((p, index) => {
@@ -742,7 +856,7 @@
             if (p.life <= 0) projectiles.splice(index, 1);
         });
 
-        // 효과 업데이트 (불바다, 연기 등)
+        // 효과 업데이트
         effects.forEach((eff, index) => {
             eff.timer--;
             if (eff.timer <= 0) effects.splice(index, 1);
@@ -751,12 +865,16 @@
         // 렌더링
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 하늘 위 떠 있는 맵 테두리 디자인
+        ctx.save();
+        // 카메라 스크롤 적용 (플레이어가 움직이면 화면도 같이 이동)
+        ctx.translate(-camera.x, -camera.y);
+
+        // 넓은 월드 맵 배경 테두리
         ctx.strokeStyle = '#68d391';
         ctx.lineWidth = 5;
-        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+        ctx.strokeRect(10, 10, worldWidth - 20, worldHeight - 20);
 
-        // 로봇 6명 렌더링 (샌드백)
+        // 로봇들 렌더링
         robots.forEach(r => {
             ctx.beginPath();
             ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
@@ -767,14 +885,13 @@
             ctx.stroke();
             ctx.closePath();
 
-            // 로봇 체력바 (무제한)
             ctx.fillStyle = '#000';
             ctx.fillRect(r.x - 18, r.y - 25, 36, 5);
             ctx.fillStyle = '#00ff00';
             ctx.fillRect(r.x - 18, r.y - 25, 36, 5);
         });
 
-        // 특수 효과 렌더링 (불바다, 연기)
+        // 특수 효과 렌더링
         effects.forEach(eff => {
             ctx.save();
             if (eff.type === 'fire') {
@@ -814,7 +931,6 @@
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
         ctx.stroke();
 
-        // 장착한 무기가 있다면 캐릭터 옆에 시각적으로 들고 있게 표시
         if (state.equippedWeaponId !== null) {
             let hx = player.x + Math.cos(player.angle) * 22;
             let hy = player.y + Math.sin(player.angle) * 22;
@@ -823,17 +939,23 @@
             ctx.fillStyle = '#ffd700';
             ctx.fill();
         }
+
+        // 브롤스타즈 대시 조준선(에임) 미리보기 시각화
+        if (dashAiming) {
+            ctx.strokeStyle = '#007aff';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y);
+            ctx.lineTo(player.x + Math.cos(dashAimAngle) * 90, player.y + Math.sin(dashAimAngle) * 90);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        ctx.restore();
     }
 
-    // 대시 버튼 (약 3칸 앞으로 순식간 이동)
-    function playerDash() {
-        let angle = joystick.dx !== 0 || joystick.dy !== 0 ? Math.atan2(joystick.dy, joystick.dx) : 0;
-        player.x += Math.cos(angle) * 90;
-        player.y += Math.sin(angle) * 90;
-        showToast("💨 대시!");
-    }
-
-    // 공격 버튼 (장착된 칼마다 완벽히 다른 공격 연출)
+    // 공격 버튼 (장착된 칼별 고유 스킬)
     function playerAttack() {
         if (state.equippedWeaponId === null) {
             showToast("맨손 주먹 퍽퍽!");
@@ -841,10 +963,9 @@
         }
 
         const weaponId = state.equippedWeaponId;
-        let angle = joystick.dx !== 0 || joystick.dy !== 0 ? Math.atan2(joystick.dy, joystick.dx) : 0;
+        let angle = joystick.dx !== 0 || joystick.dy !== 0 ? Math.atan2(joystick.dy, joystick.dx) : player.angle;
 
         if (weaponId === 0) {
-            // 1. 나무 뭉둥이: 나무 뭉둥이 칼 던지기 투사체 발사
             showToast("🪵 나무 뭉둥이 투척!");
             projectiles.push({
                 x: player.x, y: player.y,
@@ -852,7 +973,6 @@
                 color: '#d69e2e', life: 40
             });
         } else if (weaponId === 1) {
-            // 2. 크로노스 인페르노: 칼로 찌르기 근접 공격
             showToast("⏳ 크로노스 인페르노 참격!");
             projectiles.push({
                 x: player.x + Math.cos(angle) * 25, y: player.y + Math.sin(angle) * 25,
@@ -860,18 +980,15 @@
                 color: '#3182ce', life: 10
             });
         } else if (weaponId === 2) {
-            // 3. 이클립스: 앞으로 약 2칸 대시하면서 상대 공격
             showToast("🌑 이클립스 돌격 참격!");
             player.x += Math.cos(angle) * 60;
             player.y += Math.sin(angle) * 60;
         } else if (weaponId === 3) {
-            // 4. 불칼: 주변이 불바다가 되고 2.5초 뒤에 사라짐
             showToast("🔥 불칼 화염 지대 생성!");
             effects.push({
-                type: 'fire', x: player.x, y: player.y, radius: 50, timer: 150 // 60프레임 기준 2.5초 = 150프레임
+                type: 'fire', x: player.x, y: player.y, radius: 50, timer: 150
             });
         } else if (weaponId === 4) {
-            // 5. 일렉시아스: 아래에서 위로 어두운 검은색 연기가 나오는 원거리 공격
             showToast("⚡ 일렉시아스 암흑 연기 발사!");
             effects.push({
                 type: 'smoke', x: player.x + Math.cos(angle) * 40, y: player.y + Math.sin(angle) * 40, timer: 60
