@@ -104,36 +104,24 @@
         }
 
         .card-container {
-            perspective: 1000px;
             width: 140px;
             height: 140px;
             margin-bottom: 10px;
-        }
-
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transform-style: preserve-3d;
-        }
-
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
             border-radius: 16px;
+            background: #222840;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 3px solid #4a5580;
+            overflow: hidden;
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
-        .card-back { background: linear-gradient(135deg, #2b324b, #1a1f33); font-size: 30px; color: #ffd700; }
-        .card-front { background: #222840; overflow: hidden; }
-        .card-front img { width: 100%; height: 100%; object-fit: cover; }
+        .card-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .effect-general { border-color: #718096; }
         .effect-rare { border-color: #3182ce; }
@@ -170,9 +158,8 @@
         .btn-row { display: flex; gap: 8px; }
         .btn-multi { flex: 2; background: linear-gradient(135deg, #7928ca 0%, #b800ff 100%); color: #fff; }
         .btn-inventory { flex: 1; background: #2b324b; color: #fff; border: 1px solid #48537a; }
-        .btn-training { background: linear-gradient(135deg, #00b09b, #96c93d); color: #fff; }
 
-        /* 모달 스타일 (스크롤 지원) */
+        /* 모달 스타일 */
         .modal {
             position: absolute;
             top: 0; left: 0;
@@ -250,19 +237,21 @@
         .btn-sell { background: #dd6b20; color: #fff; }
         .equipped-badge { font-size: 10px; color: #ffeb3b; font-weight: bold; margin-top: 4px; }
 
-        /* 10연차 결과 모달 그리드 */
+        /* 10연차 결과 카드 그리드 스타일 */
         .multi-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
-        .multi-item {
+        .multi-card {
             background: #1a1f33;
-            border-radius: 10px;
-            padding: 8px;
+            border: 2px solid #4a5580;
+            border-radius: 12px;
+            padding: 10px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
+            text-align: center;
         }
 
         /* 훈련장 화면 */
@@ -289,6 +278,7 @@
             z-index: 10;
             pointer-events: none;
         }
+        .training-ui-top button { pointer-events: auto; }
 
         .joystick-zone {
             position: absolute;
@@ -369,7 +359,7 @@
         <div class="header">
             <button class="btn-icon" onclick="openModal('rateModal')">📊 확률표</button>
             <div class="title-area"><h1>김동희 세계관 칼 뽑기</h1></div>
-            <div style="width: 40px;"></div>
+            <button class="btn-icon" style="background: linear-gradient(135deg, #00b09b, #96c93d);" onclick="enterTraining()">🏟️ 훈련장</button>
         </div>
 
         <div class="stats-bar">
@@ -378,12 +368,8 @@
         </div>
 
         <div class="gacha-screen">
-            <div class="card-container">
-                <div class="card-inner" id="cardInner">
-                    <div class="card-front" id="cardFrontBox">
-                        <img id="weaponImg" src="15157.jpg" alt="무기">
-                    </div>
-                </div>
+            <div class="card-container" id="cardFrontBox">
+                <img id="weaponImg" src="15157.jpg" alt="무기">
             </div>
             <div class="extra-badge-text" id="extraEffectText">👎👎👎</div>
             <div class="weapon-name" id="weaponName">나무 뭉둥이</div>
@@ -395,7 +381,6 @@
                 <button class="btn btn-multi" onclick="pullWeapon(10)" id="btnMulti">✨ 10연차 뽑기 (1,000골드)</button>
                 <button class="btn btn-inventory" onclick="openModal('invModal')">🎒 보관함</button>
             </div>
-            <button class="btn btn-training" onclick="enterTraining()">🏟️ 훈련장으로 가기</button>
         </div>
     </div>
 
@@ -408,7 +393,7 @@
         
         <canvas id="gameCanvas" width="380" height="380"></canvas>
 
-        <!-- 브롤스타즈 스타일 조작계 (조이스틱 & 조준선 대시 버튼 + 공격버튼) -->
+        <!-- 브롤스타즈 멀티터치 조작계 -->
         <div class="joystick-zone" id="joystickZone">
             <div class="joystick-knob" id="joystickKnob"></div>
         </div>
@@ -443,7 +428,7 @@
     </div>
 </div>
 
-<!-- 인벤토리 모달 (스크롤 지원 및 모두 판매 버튼) -->
+<!-- 인벤토리 모달 -->
 <div class="modal" id="invModal">
     <div class="modal-header">
         <h2>보유한 무기 보관함 (최대 1개 장착)</h2>
@@ -458,10 +443,10 @@
     </div>
 </div>
 
-<!-- 10연차 즉시 결과 모달 -->
+<!-- 10연차 카드 결과 모달 -->
 <div class="modal" id="multiModal">
     <div class="modal-header">
-        <h2>✨ 10연차 뽑기 결과</h2>
+        <h2>✨ 10연차 뽑기 카드 결과</h2>
         <button class="modal-close" onclick="closeModal('multiModal')">&times;</button>
     </div>
     <div class="modal-body">
@@ -545,7 +530,6 @@
         return weapons[0];
     }
 
-    // 뽑기 로직 (1회 및 10회 즉시 출력)
     function pullWeapon(count) {
         initAudioUser();
         const cost = count === 10 ? 1000 : 100;
@@ -563,7 +547,7 @@
             state.inventory[w.id]++;
 
             document.getElementById('weaponImg').src = w.img;
-            document.getElementById('cardFrontBox').className = `card-front ${w.effectClass}`;
+            document.getElementById('cardFrontBox').className = `card-container ${w.effectClass}`;
             document.getElementById('extraEffectText').innerText = w.extraText;
             document.getElementById('weaponName').innerText = w.name;
 
@@ -572,7 +556,6 @@
                 showToast(`🔥 [${w.name}] 득템!`);
             }
         } else {
-            // 10연차 즉시 결과 10개 출력
             playSound(true);
             let results = [];
             for (let i = 0; i < 10; i++) {
@@ -585,20 +568,19 @@
             grid.innerHTML = '';
             results.forEach(w => {
                 const div = document.createElement('div');
-                div.className = `multi-item`;
+                div.className = `multi-card ${w.effectClass}`;
                 div.innerHTML = `
-                    <div style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; flex-shrink:0;">
+                    <div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; margin-bottom: 6px; border: 2px solid #fff;">
                         <img src="${w.img}" style="width:100%; height:100%; object-fit:cover;">
                     </div>
-                    <div style="overflow:hidden;">
-                        <div style="font-size: 12px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${w.name}</div>
-                        <div style="font-size: 10px; opacity: 0.8;">${w.rarity}</div>
-                    </div>
+                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 2px; color: #ffd700;">${w.extraText}</div>
+                    <div style="font-size: 13px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width:100%;">${w.name}</div>
+                    <div style="font-size: 10px; opacity: 0.8; margin-top:2px;">${w.rarity}</div>
                 `;
                 grid.appendChild(div);
             });
             openModal('multiModal');
-            showToast("✨ 10연차 즉시 뽑기 완료!");
+            showToast("✨ 10연차 카드 뽑기 완료!");
         }
 
         updateUI();
@@ -645,7 +627,6 @@
         showToast(`💰 [${weapons[id].name}] 판매 완료 (+${weapons[id].sellPrice}골드)`);
     }
 
-    // 모두 판매 기능
     function sellAllWeapons() {
         let totalGain = 0;
         weapons.forEach(w => {
@@ -703,23 +684,22 @@
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // --- 훈련장 게임 로직 (카메라 스크롤 & 브롤스타즈 에임 대시) ---
+    // --- 훈련장 게임 로직 (멀티터치 조이스틱 & 브롤 대시 에임) ---
     let canvas, ctx;
-    let worldWidth = 800, worldHeight = 380; // 넓은 월드 맵
+    let worldWidth = 800, worldHeight = 380;
     let camera = { x: 0, y: 0, width: 380, height: 380 };
     let player = { x: 400, y: 190, radius: 18, speed: 3.5, angle: 0 };
     let robots = [];
     let projectiles = [];
     let effects = [];
-    let joystick = { active: false, x: 0, y: 0, dx: 0, dy: 0 };
+    let joystick = { active: false, dx: 0, dy: 0 };
     
-    // 대시 조준선 드래그 관련 변수
     let dashAiming = false;
     let dashAimAngle = 0;
 
     let gameInterval = null;
     let playerImg = new Image();
-    playerImg.src = '15194.png';
+    playerImg.src = '15194.png';[span_11](start_span)[span_11](end_span)
 
     function enterTraining() {
         document.getElementById('mainScreen').classList.add('hidden');
@@ -731,14 +711,9 @@
         canvas = document.getElementById('gameCanvas');
         ctx = canvas.getContext('2d');
 
-        // 넓은 맵에 로봇들 배치
         robots = [];
-        for (let i = 0; i < 4; i++) {
-            robots.push({ x: 150 + i * 150, y: 90, radius: 16 });
-        }
-        for (let i = 0; i < 4; i++) {
-            robots.push({ x: 150 + i * 150, y: 290, radius: 16 });
-        }
+        for (let i = 0; i < 4; i++) robots.push({ x: 150 + i * 150, y: 90, radius: 16 });
+        for (let i = 0; i < 4; i++) robots.push({ x: 150 + i * 150, y: 290, radius: 16 });
 
         player.x = 400; player.y = 190;
         projectiles = [];
@@ -756,19 +731,39 @@
         document.getElementById('mainScreen').classList.remove('hidden');
     }
 
+    // 멀티터치를 지원하는 완벽한 조이스틱 로직 (다른 버튼과 간섭 없음)
     function setupJoystick() {
         const zone = document.getElementById('joystickZone');
         const knob = document.getElementById('joystickKnob');
         let center = { x: 65, y: 65 };
+        let touchId = null;
 
-        function handleStart(e) { joystick.active = true; handleMove(e); }
+        function handleStart(e) {
+            if (touchId !== null) return;
+            const touch = e.changedTouches ? e.changedTouches[0] : e;
+            touchId = touch.identifier !== undefined ? touch.identifier : 'mouse';
+            joystick.active = true;
+            handleMove(e);
+        }
+
         function handleMove(e) {
             if (!joystick.active) return;
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let targetTouch = null;
+            if (e.changedTouches) {
+                for (let t of e.changedTouches) {
+                    if (t.identifier === touchId || touchId === 'mouse') {
+                        targetTouch = t;
+                        break;
+                    }
+                }
+            } else {
+                targetTouch = e;
+            }
+            if (!targetTouch) return;
+
             let rect = zone.getBoundingClientRect();
-            let x = clientX - rect.left - center.x;
-            let y = clientY - rect.top - center.y;
+            let x = targetTouch.clientX - rect.left - center.x;
+            let y = targetTouch.clientY - rect.top - center.y;
             let dist = Math.sqrt(x * x + y * y);
             let maxDist = 45;
 
@@ -785,43 +780,74 @@
                 player.angle = Math.atan2(joystick.dy, joystick.dx);
             }
         }
-        function handleEnd() {
+
+        function handleEnd(e) {
+            if (e && e.changedTouches) {
+                let ended = false;
+                for (let t of e.changedTouches) {
+                    if (t.identifier === touchId) ended = true;
+                }
+                if (!ended) return;
+            }
+            touchId = null;
             joystick.active = false;
             joystick.dx = 0; joystick.dy = 0;
             knob.style.transform = `translate(0px, 0px)`;
         }
 
-        zone.addEventListener('touchstart', handleStart);
-        window.addEventListener('touchmove', handleMove);
-        window.addEventListener('touchend', handleEnd);
+        zone.addEventListener('touchstart', handleStart, {passive: true});
+        window.addEventListener('touchmove', handleMove, {passive: true});
+        window.addEventListener('touchend', handleEnd, {passive: true});
         zone.addEventListener('mousedown', handleStart);
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('mouseup', handleEnd);
     }
 
-    // 브롤스타즈 스타일 조준선 대시 드래그 조작
+    // 브롤스타즈 에임 대시 조작 (멀티터치 독립 실행)
     function setupDashAim() {
         const dashBtn = document.getElementById('dashBtn');
+        let dashTouchId = null;
 
         function onDashStart(e) {
+            if (dashTouchId !== null) return;
+            const touch = e.changedTouches ? e.changedTouches[0] : e;
+            dashTouchId = touch.identifier !== undefined ? touch.identifier : 'mouse';
             dashAiming = true;
             e.preventDefault();
         }
 
         function onDashMove(e) {
             if (!dashAiming) return;
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let targetTouch = null;
+            if (e.changedTouches) {
+                for (let t of e.changedTouches) {
+                    if (t.identifier === dashTouchId || dashTouchId === 'mouse') {
+                        targetTouch = t;
+                        break;
+                    }
+                }
+            } else {
+                targetTouch = e;
+            }
+            if (!targetTouch) return;
+
             let rect = dashBtn.getBoundingClientRect();
             let bx = rect.left + rect.width / 2;
             let by = rect.top + rect.height / 2;
-            dashAimAngle = Math.atan2(clientY - by, clientX - bx);
+            dashAimAngle = Math.atan2(targetTouch.clientY - by, targetTouch.clientX - bx);
         }
 
-        function onDashEnd() {
+        function onDashEnd(e) {
             if (!dashAiming) return;
+            if (e && e.changedTouches) {
+                let ended = false;
+                for (let t of e.changedTouches) {
+                    if (t.identifier === dashTouchId) ended = true;
+                }
+                if (!ended) return;
+            }
+            dashTouchId = null;
             dashAiming = false;
-            // 대시 실행 (약 3칸 = 90픽셀 이동)
             player.x += Math.cos(dashAimAngle) * 90;
             player.y += Math.sin(dashAimAngle) * 90;
             showToast("💨 브롤 대시 발동!");
@@ -836,45 +862,35 @@
     }
 
     function updateGame() {
-        // 플레이어 이동
         player.x += joystick.dx * player.speed;
         player.y += joystick.dy * player.speed;
 
-        // 월드 맵 경계 제한
         player.x = Math.max(player.radius + 15, Math.min(worldWidth - player.radius - 15, player.x));
         player.y = Math.max(player.radius + 15, Math.min(worldHeight - player.radius - 15, player.y));
 
-        // 카메라가 플레이어를 부드럽게 따라가도록 설정 (좌우 이동 연동)
         camera.x = player.x - camera.width / 2;
         camera.x = Math.max(0, Math.min(worldWidth - camera.width, camera.x));
 
-        // 투사체 업데이트
         projectiles.forEach((p, index) => {
-            p.x += p.vx;
-            p.y += p.vy;
+            p.x += p.vx; p.y += p.vy;
             p.life--;
             if (p.life <= 0) projectiles.splice(index, 1);
         });
 
-        // 효과 업데이트
         effects.forEach((eff, index) => {
             eff.timer--;
             if (eff.timer <= 0) effects.splice(index, 1);
         });
 
-        // 렌더링
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         ctx.save();
-        // 카메라 스크롤 적용 (플레이어가 움직이면 화면도 같이 이동)
         ctx.translate(-camera.x, -camera.y);
 
-        // 넓은 월드 맵 배경 테두리
         ctx.strokeStyle = '#68d391';
         ctx.lineWidth = 5;
         ctx.strokeRect(10, 10, worldWidth - 20, worldHeight - 20);
 
-        // 로봇들 렌더링
         robots.forEach(r => {
             ctx.beginPath();
             ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
@@ -891,7 +907,6 @@
             ctx.fillRect(r.x - 18, r.y - 25, 36, 5);
         });
 
-        // 특수 효과 렌더링
         effects.forEach(eff => {
             ctx.save();
             if (eff.type === 'fire') {
@@ -908,7 +923,6 @@
             ctx.restore();
         });
 
-        // 투사체 렌더링
         projectiles.forEach(p => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
@@ -917,12 +931,11 @@
             ctx.closePath();
         });
 
-        // 내 캐릭터 렌더링
         ctx.save();
         ctx.beginPath();
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(playerImg, player.x - player.radius, player.y - player.radius, player.radius * 2, player.radius * 2);
+        ctx.drawImage(playerImg, player.x - player.radius, player.y - player.radius, player.radius * 2, player.radius * 2);[span_12](start_span)[span_12](end_span)
         ctx.restore();
 
         ctx.lineWidth = 2;
@@ -940,7 +953,6 @@
             ctx.fill();
         }
 
-        // 브롤스타즈 대시 조준선(에임) 미리보기 시각화
         if (dashAiming) {
             ctx.strokeStyle = '#007aff';
             ctx.lineWidth = 4;
@@ -955,7 +967,6 @@
         ctx.restore();
     }
 
-    // 공격 버튼 (장착된 칼별 고유 스킬)
     function playerAttack() {
         if (state.equippedWeaponId === null) {
             showToast("맨손 주먹 퍽퍽!");
@@ -967,37 +978,21 @@
 
         if (weaponId === 0) {
             showToast("🪵 나무 뭉둥이 투척!");
-            projectiles.push({
-                x: player.x, y: player.y,
-                vx: Math.cos(angle) * 6, vy: Math.sin(angle) * 6,
-                color: '#d69e2e', life: 40
-            });
+            projectiles.push({ x: player.x, y: player.y, vx: Math.cos(angle) * 6, vy: Math.sin(angle) * 6, color: '#d69e2e', life: 40 });
         } else if (weaponId === 1) {
             showToast("⏳ 크로노스 인페르노 참격!");
-            projectiles.push({
-                x: player.x + Math.cos(angle) * 25, y: player.y + Math.sin(angle) * 25,
-                vx: Math.cos(angle) * 2, vy: Math.sin(angle) * 2,
-                color: '#3182ce', life: 10
-            });
+            projectiles.push({ x: player.x + Math.cos(angle) * 25, y: player.y + Math.sin(angle) * 25, vx: Math.cos(angle) * 2, vy: Math.sin(angle) * 2, color: '#3182ce', life: 10 });
         } else if (weaponId === 2) {
             showToast("🌑 이클립스 돌격 참격!");
             player.x += Math.cos(angle) * 60;
             player.y += Math.sin(angle) * 60;
         } else if (weaponId === 3) {
             showToast("🔥 불칼 화염 지대 생성!");
-            effects.push({
-                type: 'fire', x: player.x, y: player.y, radius: 50, timer: 150
-            });
+            effects.push({ type: 'fire', x: player.x, y: player.y, radius: 50, timer: 150 });
         } else if (weaponId === 4) {
             showToast("⚡ 일렉시아스 암흑 연기 발사!");
-            effects.push({
-                type: 'smoke', x: player.x + Math.cos(angle) * 40, y: player.y + Math.sin(angle) * 40, timer: 60
-            });
-            projectiles.push({
-                x: player.x, y: player.y,
-                vx: Math.cos(angle) * 7, vy: Math.sin(angle) * 7,
-                color: '#2d3748', life: 45
-            });
+            effects.push({ type: 'smoke', x: player.x + Math.cos(angle) * 40, y: player.y + Math.sin(angle) * 40, timer: 60 });
+            projectiles.push({ x: player.x, y: player.y, vx: Math.cos(angle) * 7, vy: Math.sin(angle) * 7, color: '#2d3748', life: 45 });
         }
     }
 
