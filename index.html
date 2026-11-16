@@ -35,7 +35,6 @@
             position: relative;
         }
 
-        /* 화면 전환용 클래스 */
         .screen {
             display: flex;
             flex-direction: column;
@@ -218,18 +217,21 @@
         }
         .inv-count { position: absolute; top: 6px; right: 8px; font-size: 10px; background: rgba(0,0,0,0.6); padding: 2px 5px; border-radius: 4px; color: #ffd700; }
         
-        .btn-equip {
-            margin-top: 6px;
-            padding: 4px 10px;
-            font-size: 11px;
+        .btn-action-row { display: flex; gap: 4px; margin-top: 6px; width: 100%; }
+        .btn-equip, .btn-sell {
+            flex: 1;
+            padding: 5px 2px;
+            font-size: 10px;
             border-radius: 6px;
             border: none;
             cursor: pointer;
             font-weight: bold;
         }
+        .btn-equip { background: #3182ce; color: #fff; }
+        .btn-sell { background: #dd6b20; color: #fff; }
         .equipped-badge { font-size: 10px; color: #ffeb3b; font-weight: bold; margin-top: 4px; }
 
-        /* 훈련장 캔버스 화면 스타일 (하늘 위 정사각형 맵 & 브롤스타즈 스타일 조작계) */
+        /* 훈련장 화면 */
         #trainingScreen {
             background: #1a233a;
             position: relative;
@@ -237,7 +239,7 @@
         }
 
         #gameCanvas {
-            background: linear-gradient(135deg, #3a6073, #16222a);
+            background: linear-gradient(135deg, #243b55, #141e30);
             display: block;
             margin: auto;
             border: 4px solid #4a5580;
@@ -246,9 +248,7 @@
 
         .training-ui-top {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
+            top: 15px; left: 15px; right: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -258,12 +258,10 @@
 
         .joystick-zone {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 120px;
-            height: 120px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.3);
+            bottom: 25px; left: 25px;
+            width: 130px; height: 130px;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.25);
             border-radius: 50%;
             z-index: 10;
             touch-action: none;
@@ -271,41 +269,43 @@
 
         .joystick-knob {
             position: absolute;
-            top: 35px;
-            left: 35px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.6);
+            top: 40px; left: 40px;
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.7);
             border-radius: 50%;
             pointer-events: none;
         }
 
         .brawl-btns {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            bottom: 25px; right: 25px;
             display: flex;
-            gap: 15px;
+            flex-direction: column;
+            gap: 12px;
             z-index: 10;
+            align-items: flex-end;
+        }
+
+        .brawl-row {
+            display: flex;
+            gap: 12px;
         }
 
         .brawl-btn {
-            width: 65px;
-            height: 65px;
+            width: 60px; height: 60px;
             border-radius: 50%;
             border: 3px solid #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #fff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             cursor: pointer;
         }
 
-        .btn-attack { background: #ff3b30; }
-        .btn-skill { background: #ffcc00; color: #000; }
+        .btn-attack { background: #ff3b30; width: 70px; height: 70px; font-size: 22px; }
         .btn-dash { background: #007aff; }
 
         #toast {
@@ -329,7 +329,7 @@
 <body onclick="initAudioUser()">
 
 <div class="container">
-    <!-- 메인 가챠 화면 -->
+    <!-- 메인 화면 -->
     <div id="mainScreen" class="screen">
         <div class="header">
             <button class="btn-icon" onclick="openModal('rateModal')">📊 확률표</button>
@@ -365,7 +365,7 @@
         </div>
     </div>
 
-    <!-- 훈련장 화면 (하늘 위 정사각형 맵 & 브롤스타즈 조작) -->
+    <!-- 훈련장 화면 -->
     <div id="trainingScreen" class="screen hidden">
         <div class="training-ui-top">
             <button class="btn-icon" onclick="exitTraining()">⬅️ 나가기</button>
@@ -374,14 +374,17 @@
         
         <canvas id="gameCanvas" width="380" height="380"></canvas>
 
-        <!-- 브롤스타즈 조작계 -->
+        <!-- 브롤스타즈 스타일 조작계 (조이스틱 & 대시버튼 + 공격버튼) -->
         <div class="joystick-zone" id="joystickZone">
             <div class="joystick-knob" id="joystickKnob"></div>
         </div>
         <div class="brawl-btns">
-            <div class="brawl-btn btn-dash" onclick="playerDash()">💨</div>
-            <div class="brawl-btn btn-skill" onclick="playerSkill()">💥</div>
-            <div class="brawl-btn btn-attack" onclick="playerAttack()">⚔️</div>
+            <div class="brawl-row">
+                <div class="brawl-btn btn-dash" onclick="playerDash()">💨</div>
+            </div>
+            <div class="brawl-row">
+                <div class="brawl-btn btn-attack" onclick="playerAttack()">⚔️</div>
+            </div>
         </div>
     </div>
 </div>
@@ -396,17 +399,17 @@
         <table class="rate-table">
             <thead><tr><th>칼 이름 : 확률</th><th style="text-align: right;">비율</th></tr></thead>
             <tbody>
-                <tr><td>나무 뭉둥이 (일반)</td><td style="text-align: right; color:#a0aec0;">65.0%</td></tr>
-                <tr><td>크로노스 인페르노 (희귀)</td><td style="text-align: right; color:#3182ce;">15.0%</td></tr>
-                <tr><td>이클립스 (영웅)</td><td style="text-align: right; color:#805ad5;">10.0%</td></tr>
-                <tr><td>불칼 (전설)</td><td style="text-align: right; color:#ecc94b;">7.5%</td></tr>
-                <tr><td>일렉시아스 (신화)</td><td style="text-align: right; color:#e53e3e;">2.5%</td></tr>
+                <tr><td>나무 뭉둥이 (일반 - 70골드)</td><td style="text-align: right; color:#a0aec0;">65.0%</td></tr>
+                <tr><td>크로노스 인페르노 (희귀 - 150골드)</td><td style="text-align: right; color:#3182ce;">15.0%</td></tr>
+                <tr><td>이클립스 (영웅 - 300골드)</td><td style="text-align: right; color:#805ad5;">10.0%</td></tr>
+                <tr><td>불칼 (전설 - 900골드)</td><td style="text-align: right; color:#ecc94b;">7.5%</td></tr>
+                <tr><td>일렉시아스 (신화 - 2500골드)</td><td style="text-align: right; color:#e53e3e;">2.5%</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- 인벤토리 모달 (장착하기/장착해제 포함) -->
+<!-- 인벤토리 모달 (장착/해제 및 판매하기 기능 포함) -->
 <div class="modal" id="invModal">
     <div class="modal-header">
         <h2>보유한 무기 보관함 (최대 1개 장착)</h2>
@@ -421,11 +424,11 @@
 
 <script>
     const weapons = [
-        { id: 0, name: "나무 뭉둥이", rarity: "일반", effectClass: "effect-general", extraText: "👎👎👎", img: "15157.jpg", rate: 65.0, skillName: "퍽퍽 휘두르기" },
-        { id: 1, name: "크로노스 인페르노", rarity: "희귀", effectClass: "effect-rare", extraText: "파란색 기운", img: "15158.jpg", rate: 15.0, skillName: "시간 폭발" },
-        { id: 2, name: "이클립스", rarity: "영웅", effectClass: "effect-epic", extraText: "보라색 오라", img: "15159.jpg", rate: 10.0, skillName: "어둠의 참격" },
-        { id: 3, name: "불칼", rarity: "전설", effectClass: "effect-legendary", extraText: "⭐️⭐️⭐️⭐️", img: "15161.jpg", rate: 7.5, skillName: "화염 폭풍" },
-        { id: 4, name: "일렉시아스", rarity: "신화", effectClass: "effect-myth", extraText: "🔥 불타는 신검 🔥", img: "15162.jpg", rate: 2.5, skillName: "번개 낙하" }
+        { id: 0, name: "나무 뭉둥이", rarity: "일반", sellPrice: 70, effectClass: "effect-general", extraText: "👎👎👎", img: "15157.jpg", rate: 65.0 },
+        { id: 1, name: "크로노스 인페르노", rarity: "희귀", sellPrice: 150, effectClass: "effect-rare", extraText: "파란색 기운", img: "15158.jpg", rate: 15.0 },
+        { id: 2, name: "이클립스", rarity: "영웅", sellPrice: 300, effectClass: "effect-epic", extraText: "보라색 오라", img: "15159.jpg", rate: 10.0 },
+        { id: 3, name: "불칼", rarity: "전설", sellPrice: 900, effectClass: "effect-legendary", extraText: "⭐️⭐️⭐️⭐️", img: "15161.jpg", rate: 7.5 },
+        { id: 4, name: "일렉시아스", rarity: "신화", sellPrice: 2500, effectClass: "effect-myth", extraText: "🔥 불타는 신검 🔥", img: "15162.jpg", rate: 2.5 }
     ];
 
     let state = {
@@ -579,6 +582,22 @@
         showToast("장착 해제 완료!");
     }
 
+    function sellWeapon(id) {
+        if (state.inventory[id] <= 0) {
+            showToast("⚠️ 판매할 칼이 없다!");
+            return;
+        }
+        state.inventory[id]--;
+        if (state.equippedWeaponId === id && state.inventory[id] === 0) {
+            state.equippedWeaponId = null;
+        }
+        state.gold += weapons[id].sellPrice;
+        saveGameData();
+        updateUI();
+        updateInventoryGrid();
+        showToast(`💰 [${weapons[id].name}] 판매 완료 (+${weapons[id].sellPrice}골드)`);
+    }
+
     function updateInventoryGrid() {
         const grid = document.getElementById('inventoryGrid');
         grid.innerHTML = '';
@@ -590,12 +609,16 @@
             div.className = `inv-item ${w.rarity === '일반' ? 'grade-general' : w.rarity === '희귀' ? 'grade-rare' : w.rarity === '영웅' ? 'grade-epic' : w.rarity === '전설' ? 'grade-legendary' : 'grade-myth'}`;
             div.innerHTML = `
                 <div class="inv-count">${count}개</div>
-                <div style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; margin-bottom: 4px;">
+                <div style="width: 45px; height: 45px; border-radius: 8px; overflow: hidden; margin-bottom: 4px;">
                     <img src="${w.img}" style="width:100%; height:100%; object-fit:cover;">
                 </div>
-                <div style="font-size: 12px; font-weight: bold;">${w.name}</div>
-                ${isEquipped ? '<div class="equipped-badge">장착중 [최대1개]</div>' : ''}
-                ${count > 0 ? (isEquipped ? `<button class="btn-equip" style="background:#e53e3e; color:#fff;" onclick="unequipWeapon()">장착 해제</button>` : `<button class="btn-equip" style="background:#3182ce; color:#fff;" onclick="equipWeapon(${w.id})">장착하기</button>`) : ''}
+                <div style="font-size: 11px; font-weight: bold;">${w.name}</div>
+                <div style="font-size: 9px; opacity: 0.9;">판매: ${w.sellPrice}골드</div>
+                ${isEquipped ? '<div class="equipped-badge">장착중</div>' : ''}
+                <div class="btn-action-row">
+                    ${count > 0 ? (isEquipped ? `<button class="btn-equip" style="background:#e53e3e;" onclick="unequipWeapon()">해제</button>` : `<button class="btn-equip" onclick="equipWeapon(${w.id})">장착</button>`) : ''}
+                    ${count > 0 ? `<button class="btn-sell" onclick="sellWeapon(${w.id})">판매</button>` : ''}
+                </div>
             `;
             grid.appendChild(div);
         });
@@ -615,20 +638,22 @@
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // --- 훈련장 게임 로직 ---
+    // --- 훈련장 게임 로직 (디테일 업그레이드) ---
     let canvas, ctx;
-    let player = { x: 190, y: 190, radius: 18, speed: 3, color: '#00ffcc' };
+    let player = { x: 190, y: 190, radius: 18, speed: 3.5, angle: 0 };
     let robots = [];
+    let projectiles = [];
+    let effects = []; // 불바다, 연기 등 특수 효과 배열
     let joystick = { active: false, x: 0, y: 0, dx: 0, dy: 0 };
     let gameInterval = null;
     let playerImg = new Image();
-    playerImg.src = '15194.png'; // 첫 번째 사진 캐릭터
+    playerImg.src = '15194.png';
 
     function enterTraining() {
         document.getElementById('mainScreen').classList.add('hidden');
         document.getElementById('trainingScreen').classList.remove('hidden');
 
-        const eqName = state.equippedWeaponId !== null ? weapons[state.equippedWeaponId].name + " (" + weapons[state.equippedWeaponId].skillName + ")" : "없음 (맨손)";
+        const eqName = state.equippedWeaponId !== null ? weapons[state.equippedWeaponId].name : "맨손";
         document.getElementById('equippedDisplay').innerText = "장착 무기: " + eqName;
 
         canvas = document.getElementById('gameCanvas');
@@ -636,16 +661,17 @@
 
         // 로봇 배치 (왼쪽 3명, 오른쪽 3명)
         robots = [];
-        // 왼쪽 3명
         for (let i = 0; i < 3; i++) {
-            robots.push({ x: 70, y: 100 + i * 90, radius: 16, hp: 99999, maxHp: 99999 });
+            robots.push({ x: 60, y: 90 + i * 100, radius: 16 });
         }
-        // 오른쪽 3명
         for (let i = 0; i < 3; i++) {
-            robots.push({ x: 310, y: 100 + i * 90, radius: 16, hp: 99999, maxHp: 99999 });
+            robots.push({ x: 320, y: 90 + i * 100, radius: 16 });
         }
 
+        projectiles = [];
+        effects = [];
         setupJoystick();
+
         if (gameInterval) clearInterval(gameInterval);
         gameInterval = setInterval(updateGame, 1000 / 60);
     }
@@ -659,23 +685,18 @@
     function setupJoystick() {
         const zone = document.getElementById('joystickZone');
         const knob = document.getElementById('joystickKnob');
-        let rect = zone.getBoundingClientRect();
-        let center = { x: 60, y: 60 };
+        let center = { x: 65, y: 65 };
 
-        function handleStart(e) {
-            joystick.active = true;
-            handleMove(e);
-        }
-
+        function handleStart(e) { joystick.active = true; handleMove(e); }
         function handleMove(e) {
             if (!joystick.active) return;
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            rect = zone.getBoundingClientRect();
+            let rect = zone.getBoundingClientRect();
             let x = clientX - rect.left - center.x;
             let y = clientY - rect.top - center.y;
             let dist = Math.sqrt(x * x + y * y);
-            let maxDist = 40;
+            let maxDist = 45;
 
             if (dist > maxDist) {
                 x = (x / dist) * maxDist;
@@ -685,12 +706,14 @@
             knob.style.transform = `translate(${x}px, ${y}px)`;
             joystick.dx = x / maxDist;
             joystick.dy = y / maxDist;
-        }
 
+            if (dist > 5) {
+                player.angle = Math.atan2(joystick.dy, joystick.dx);
+            }
+        }
         function handleEnd() {
             joystick.active = false;
-            joystick.dx = 0;
-            joystick.dy = 0;
+            joystick.dx = 0; joystick.dy = 0;
             knob.style.transform = `translate(0px, 0px)`;
         }
 
@@ -707,37 +730,77 @@
         player.x += joystick.dx * player.speed;
         player.y += joystick.dy * player.speed;
 
-        // 정사각형 맵 경계 제한
-        player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
-        player.y = Math.max(player.radius, Math.min(canvas.height - player.radius, player.y));
+        // 하늘 위 정사각형 맵 경계 제한
+        player.x = Math.max(player.radius + 15, Math.min(canvas.width - player.radius - 15, player.x));
+        player.y = Math.max(player.radius + 15, Math.min(canvas.height - player.radius - 15, player.y));
 
-        // 화면 렌더링
+        // 투사체 업데이트
+        projectiles.forEach((p, index) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            if (p.life <= 0) projectiles.splice(index, 1);
+        });
+
+        // 효과 업데이트 (불바다, 연기 등)
+        effects.forEach((eff, index) => {
+            eff.timer--;
+            if (eff.timer <= 0) effects.splice(index, 1);
+        });
+
+        // 렌더링
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 하늘 위 맵 테두리 효과
+        // 하늘 위 떠 있는 맵 테두리 디자인
         ctx.strokeStyle = '#68d391';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 5;
         ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
 
-        // 로봇 6명 렌더링 (공격 안 함, 피 무제한)
+        // 로봇 6명 렌더링 (샌드백)
         robots.forEach(r => {
             ctx.beginPath();
             ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff5555';
+            ctx.fillStyle = '#ff4d4d';
             ctx.fill();
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#fff';
             ctx.stroke();
             ctx.closePath();
 
-            // 로봇 체력바
+            // 로봇 체력바 (무제한)
             ctx.fillStyle = '#000';
-            ctx.fillRect(r.x - 18, r.y - 26, 36, 5);
+            ctx.fillRect(r.x - 18, r.y - 25, 36, 5);
             ctx.fillStyle = '#00ff00';
-            ctx.fillRect(r.x - 18, r.y - 26, 36, 5);
+            ctx.fillRect(r.x - 18, r.y - 25, 36, 5);
         });
 
-        // 내 캐릭터 렌더링 (첫 번째 사진 적용)
+        // 특수 효과 렌더링 (불바다, 연기)
+        effects.forEach(eff => {
+            ctx.save();
+            if (eff.type === 'fire') {
+                ctx.fillStyle = 'rgba(255, 69, 0, 0.5)';
+                ctx.beginPath();
+                ctx.arc(eff.x, eff.y, eff.radius, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (eff.type === 'smoke') {
+                ctx.fillStyle = 'rgba(30, 30, 30, 0.7)';
+                ctx.beginPath();
+                ctx.arc(eff.x, eff.y - (150 - eff.timer), 25, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        });
+
+        // 투사체 렌더링
+        projectiles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.closePath();
+        });
+
+        // 내 캐릭터 렌더링
         ctx.save();
         ctx.beginPath();
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
@@ -750,30 +813,77 @@
         ctx.beginPath();
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
         ctx.stroke();
+
+        // 장착한 무기가 있다면 캐릭터 옆에 시각적으로 들고 있게 표시
+        if (state.equippedWeaponId !== null) {
+            let hx = player.x + Math.cos(player.angle) * 22;
+            let hy = player.y + Math.sin(player.angle) * 22;
+            ctx.beginPath();
+            ctx.arc(hx, hy, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffd700';
+            ctx.fill();
+        }
     }
 
-    // 칼별 스킬 및 공격 액션
-    function playerAttack() {
-        showToast("⚔️ 기본 공격!");
-    }
-
+    // 대시 버튼 (약 3칸 앞으로 순식간 이동)
     function playerDash() {
-        showToast("💨 대쉬!");
-        // 순간 이동 효과
-        player.x += joystick.dx * 50;
-        player.y += joystick.dy * 50;
+        let angle = joystick.dx !== 0 || joystick.dy !== 0 ? Math.atan2(joystick.dy, joystick.dx) : 0;
+        player.x += Math.cos(angle) * 90;
+        player.y += Math.sin(angle) * 90;
+        showToast("💨 대시!");
     }
 
-    function playerSkill() {
+    // 공격 버튼 (장착된 칼마다 완벽히 다른 공격 연출)
+    function playerAttack() {
         if (state.equippedWeaponId === null) {
-            showToast("⚠️ 장착한 칼이 없다! 맨손 스킬!");
+            showToast("맨손 주먹 퍽퍽!");
             return;
         }
-        const w = weapons[state.equippedWeaponId];
-        showToast(`💥 스킬 발동: [${w.skillName}]!`);
+
+        const weaponId = state.equippedWeaponId;
+        let angle = joystick.dx !== 0 || joystick.dy !== 0 ? Math.atan2(joystick.dy, joystick.dx) : 0;
+
+        if (weaponId === 0) {
+            // 1. 나무 뭉둥이: 나무 뭉둥이 칼 던지기 투사체 발사
+            showToast("🪵 나무 뭉둥이 투척!");
+            projectiles.push({
+                x: player.x, y: player.y,
+                vx: Math.cos(angle) * 6, vy: Math.sin(angle) * 6,
+                color: '#d69e2e', life: 40
+            });
+        } else if (weaponId === 1) {
+            // 2. 크로노스 인페르노: 칼로 찌르기 근접 공격
+            showToast("⏳ 크로노스 인페르노 참격!");
+            projectiles.push({
+                x: player.x + Math.cos(angle) * 25, y: player.y + Math.sin(angle) * 25,
+                vx: Math.cos(angle) * 2, vy: Math.sin(angle) * 2,
+                color: '#3182ce', life: 10
+            });
+        } else if (weaponId === 2) {
+            // 3. 이클립스: 앞으로 약 2칸 대시하면서 상대 공격
+            showToast("🌑 이클립스 돌격 참격!");
+            player.x += Math.cos(angle) * 60;
+            player.y += Math.sin(angle) * 60;
+        } else if (weaponId === 3) {
+            // 4. 불칼: 주변이 불바다가 되고 2.5초 뒤에 사라짐
+            showToast("🔥 불칼 화염 지대 생성!");
+            effects.push({
+                type: 'fire', x: player.x, y: player.y, radius: 50, timer: 150 // 60프레임 기준 2.5초 = 150프레임
+            });
+        } else if (weaponId === 4) {
+            // 5. 일렉시아스: 아래에서 위로 어두운 검은색 연기가 나오는 원거리 공격
+            showToast("⚡ 일렉시아스 암흑 연기 발사!");
+            effects.push({
+                type: 'smoke', x: player.x + Math.cos(angle) * 40, y: player.y + Math.sin(angle) * 40, timer: 60
+            });
+            projectiles.push({
+                x: player.x, y: player.y,
+                vx: Math.cos(angle) * 7, vy: Math.sin(angle) * 7,
+                color: '#2d3748', life: 45
+            });
+        }
     }
 
-    // 초기 실행
     loadGameData();
     updateUI();
     updateInventoryGrid();
